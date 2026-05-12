@@ -4,26 +4,26 @@
     "slug": "specialty-coffee-shops",
     "name": "Specialty Coffee Shop",
     "description": "Discover the best local specialty coffee shops near you. Find expertly brewed coffee, unique atmospheres, and your next favorite cup. Explore our directory now!",
-    "icon_large_url": "https://1oeeb0zeqqw4lwi0.public.blob.vercel-storage.com/images/lsc/67e26af38e753166c1b59e3e_Large-icon-Specialty-Coffee-52-x-48-px.svg",
-    "icon_small_url": "https://1oeeb0zeqqw4lwi0.public.blob.vercel-storage.com/images/lsc/67e275bb08a5ef1fe0ec2b1a_Specialty-coffee-icon-1-.svg",
-    "icon_dark_small_url": "https://1oeeb0zeqqw4lwi0.public.blob.vercel-storage.com/images/lsc/67e29d5abc4dcc755c842ff1_Dark-Specialty-coffee-icon-1-.svg"
+    "icon_large_url": "https://pub-8b061befab9c49bda0632e3619d45c0f.r2.dev/images/lsc/67e26af38e753166c1b59e3e_Large-icon-Specialty-Coffee-52-x-48-px.svg",
+    "icon_small_url": "https://pub-8b061befab9c49bda0632e3619d45c0f.r2.dev/images/lsc/67e275bb08a5ef1fe0ec2b1a_Specialty-coffee-icon-1-.svg",
+    "icon_dark_small_url": "https://pub-8b061befab9c49bda0632e3619d45c0f.r2.dev/images/lsc/67e29d5abc4dcc755c842ff1_Dark-Specialty-coffee-icon-1-.svg"
   },
   {
     "webflow_id": "67d40638d300a0e9ce0627d1",
     "slug": "coffee-roasters",
     "name": "Coffee Roaster",
     "description": "Explore local coffee roasteries crafting exceptional beans. Find freshly roasted coffee, learn about the process, and buy direct from the source. Find roasteries in our directory!",
-    "icon_large_url": "https://1oeeb0zeqqw4lwi0.public.blob.vercel-storage.com/images/lsc/67e2767aac1a28f7ecb38ab3_Coffee-Roaster-Large-Icon.svg",
-    "icon_small_url": "https://1oeeb0zeqqw4lwi0.public.blob.vercel-storage.com/images/lsc/67e1a7e06fdd559adff20a1d_Coffee-Roaster-Icon.svg",
-    "icon_dark_small_url": "https://1oeeb0zeqqw4lwi0.public.blob.vercel-storage.com/images/lsc/67e29d4dc5cc446fffe4de96_Dark-Coffee-Roaster-Icon-1-.svg"
+    "icon_large_url": "https://pub-8b061befab9c49bda0632e3619d45c0f.r2.dev/images/lsc/67e2767aac1a28f7ecb38ab3_Coffee-Roaster-Large-Icon.svg",
+    "icon_small_url": "https://pub-8b061befab9c49bda0632e3619d45c0f.r2.dev/images/lsc/67e1a7e06fdd559adff20a1d_Coffee-Roaster-Icon.svg",
+    "icon_dark_small_url": "https://pub-8b061befab9c49bda0632e3619d45c0f.r2.dev/images/lsc/67e29d4dc5cc446fffe4de96_Dark-Coffee-Roaster-Icon-1-.svg"
   },
   {
     "webflow_id": "67d40638d300a0e9ce0627b5",
     "slug": "barista-course",
     "name": "Barista Course",
     "description": "Ready to make the perfect coffee? Find local barista courses and coffee training programs to hone your skills, from beginner basics to advanced latte art. Learn more and sign up!",
-    "icon_large_url": "https://1oeeb0zeqqw4lwi0.public.blob.vercel-storage.com/images/lsc/67e26ddcc4589f2c3440e2e5_Coffee-Classes-Large-Icon.svg",
-    "icon_small_url": "https://1oeeb0zeqqw4lwi0.public.blob.vercel-storage.com/images/lsc/67e2759d87bd4e92002b8008_Coffee-Classes-icon-2-.svg",
-    "icon_dark_small_url": "https://1oeeb0zeqqw4lwi0.public.blob.vercel-storage.com/images/lsc/67e29d4117a6e9ec3825cf9f_Dark-Coffee-Classes-icon-1-.svg"
+    "icon_large_url": "https://pub-8b061befab9c49bda0632e3619d45c0f.r2.dev/images/lsc/67e26ddcc4589f2c3440e2e5_Coffee-Classes-Large-Icon.svg",
+    "icon_small_url": "https://pub-8b061befab9c49bda0632e3619d45c0f.r2.dev/images/lsc/67e2759d87bd4e92002b8008_Coffee-Classes-icon-2-.svg",
+    "icon_dark_small_url": "https://pub-8b061befab9c49bda0632e3619d45c0f.r2.dev/images/lsc/67e29d4117a6e9ec3825cf9f_Dark-Coffee-Classes-icon-1-.svg"
   }
 ]

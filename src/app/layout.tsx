@@ -3,9 +3,9 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CookieConsent } from "@/components/CookieConsent";
+import { BRAND } from "@/lib/brand";
 
-const DEFAULT_OG_IMAGE =
-  "https://cdn.prod.website-files.com/67d40637d300a0e9ce062510/67ec41bcc721c1659c005b6c_Specialty_Coffee_Map_Visual%20(2).png";
+const DEFAULT_OG_IMAGE = BRAND.brewtifulMapVisual;
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.localspecialtycoffee.com"),
@@ -45,7 +45,7 @@ export default function RootLayout({
                 "@type": "Organization",
                 name: "Local Specialty Coffee",
                 url: "https://www.localspecialtycoffee.com",
-                logo: "https://cdn.prod.website-files.com/67d40637d300a0e9ce062510/67d563468b5918265ae11dff_brandmark-design_2%20(1).png",
+                logo: BRAND.logo,
               },
               {
                 "@context": "https://schema.org",

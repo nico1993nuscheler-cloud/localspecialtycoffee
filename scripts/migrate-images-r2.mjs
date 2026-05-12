@@ -68,17 +68,19 @@ async function collectAllUrls() {
   for (const c of cities) urlsFromObject(c, cityFields).forEach((u) => all.add(u));
   for (const c of cats) urlsFromObject(c, catFields).forEach((u) => all.add(u));
 
-  // Add brand.ts URLs (logo, hero collage, etc.) by extracting cdn.prod.* URLs
+  // Add brand.ts URLs (logo, hero collage, etc.).
   const brand = await fs.readFile(BRAND_TS, "utf8");
-  for (const m of brand.matchAll(/https:\/\/cdn\.prod\.website-files\.com\/[^\s`"]+/g)) all.add(m[0]);
-  // Also resolve template-literal CDN URLs in case they remain
   const CDN = "https://cdn.prod.website-files.com/67d40637d300a0e9ce062510";
   const CAT_CDN = "https://cdn.prod.website-files.com/67d40638d300a0e9ce06264e";
   for (const m of brand.matchAll(/`\$\{CDN\}\/([^`]+)`/g)) all.add(`${CDN}/${m[1]}`);
   for (const m of brand.matchAll(/`\$\{CAT_CDN\}\/([^`]+)`/g)) all.add(`${CAT_CDN}/${m[1]}`);
+  // Bare-string URLs in brand.ts must end in a real asset extension to avoid
+  // picking up bare CDN/CAT_CDN constants.
+  for (const m of brand.matchAll(/https:\/\/cdn\.prod\.website-files\.com\/[^\s`"]+\.(?:png|jpe?g|svg|webp|avif|gif|ico)/gi)) all.add(m[0]);
 
-  // Filter to only Webflow CDN URLs (already-migrated Vercel Blob URLs should
-  // not be re-uploaded; we'll handle those during the JSON rewrite step).
+  // Only return Webflow CDN URLs — already-migrated URLs (Vercel Blob) are
+  // handled by the JSON rewrite step picking up nothing for those (they're
+  // not in the map). The current data files should be Webflow-pointing now.
   return [...all].filter((u) => u.includes("cdn.prod.website-files.com"));
 }
 
