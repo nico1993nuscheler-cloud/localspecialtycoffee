@@ -108,6 +108,8 @@ export function Footer() {
               <li><Link href="/faqs" className="hover:text-coral-bright transition-colors">FAQs</Link></li>
               <li><Link href="/submissions" className="hover:text-coral-bright transition-colors">Submissions</Link></li>
               <li><Link href="/terms-conditions" className="hover:text-coral-bright transition-colors">Terms &amp; Conditions</Link></li>
+              <li><Link href="/privacy" className="hover:text-coral-bright transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/imprint" className="hover:text-coral-bright transition-colors">Imprint</Link></li>
             </ul>
           </div>
         </div>
