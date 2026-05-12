@@ -1,6 +1,13 @@
 @import "tailwindcss";
 
 @theme {
+  /* Re-declare baseline neutrals so the `text-white` / `text-black` / `bg-white`
+   * utilities resolve correctly in v4 (otherwise the `var(--color-white)` lookup
+   * inside `.text-white { color: var(--color-white) }` falls back to inherited
+   * ink, which broke our coral-button contrast). */
+  --color-white: #ffffff;
+  --color-black: #000000;
+
   /* Accessibility-tuned coral: original Webflow #f36756 fails WCAG AA
    * (3.04:1 vs white). #cf483a passes at 4.55:1 — still recognizably the
    * LSC coral but readable on white backgrounds and as button text. */
