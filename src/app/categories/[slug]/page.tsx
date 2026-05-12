@@ -5,15 +5,16 @@ import { getAllCategories, getAllCities, getCategoryBySlug, getPlacesInCategory 
 import { PlaceFilters } from "@/components/PlaceFilters";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 
-export const dynamicParams = false;
+export const dynamicParams = true;
+export const revalidate = 300;
 
-export function generateStaticParams() {
-  return getAllCategories().map((c) => ({ slug: c.slug }));
+export async function generateStaticParams() {
+  return (await getAllCategories()).map((c) => ({ slug: c.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const cat = getCategoryBySlug(slug);
+  const cat = await getCategoryBySlug(slug);
   if (!cat) return {};
   return {
     title: `Local ${cat.name}s in your city`,
@@ -24,11 +25,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const cat = getCategoryBySlug(slug);
+  const cat = await getCategoryBySlug(slug);
   if (!cat) return notFound();
-  const places = getPlacesInCategory(cat.webflow_id);
+  const [places, allCities] = await Promise.all([
+    getPlacesInCategory(cat.webflow_id),
+    getAllCities(),
+  ]);
   // Only show cities that actually have a place in this category in the dropdown.
-  const citiesWithPlaces = getAllCities().filter((c) =>
+  const citiesWithPlaces = allCities.filter((c) =>
     places.some((p) => p.city.slug === c.slug),
   );
 

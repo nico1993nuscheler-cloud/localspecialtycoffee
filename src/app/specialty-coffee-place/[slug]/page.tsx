@@ -8,15 +8,16 @@ import { PlaceCTAs } from "@/components/PlaceCTAs";
 import { Gallery } from "@/components/Gallery";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 
-export const dynamicParams = false;
+export const dynamicParams = true;
+export const revalidate = 120;
 
-export function generateStaticParams() {
-  return getAllPlaces().map((p) => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  return (await getAllPlaces()).map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const p = getPlaceBySlug(slug);
+  const p = await getPlaceBySlug(slug);
   if (!p) return {};
   const year = new Date().getFullYear();
   return {
@@ -82,10 +83,10 @@ const FEATURE_GROUPS: { label: string; items: { key: string; label: string }[] }
 
 export default async function PlacePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const p = getPlaceBySlug(slug);
+  const p = await getPlaceBySlug(slug);
   if (!p) return notFound();
 
-  const otherPlaces = getPlacesInCity(p.city_webflow_id)
+  const otherPlaces = (await getPlacesInCity(p.city_webflow_id))
     .filter((o) => o.webflow_id !== p.webflow_id)
     .slice(0, 3);
 

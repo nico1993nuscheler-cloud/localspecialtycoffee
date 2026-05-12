@@ -14,29 +14,36 @@ import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 import { TrendingShuffle } from "@/components/TrendingShuffle";
 import { FeaturedCitiesGrid } from "@/components/FeaturedCitiesGrid";
 
-export default function HomePage() {
-  const cities = getAllCities();
-  const categories = getAllCategories();
-  const totalPlaces = getAllPlaces().length;
+export const revalidate = 600;
 
-  // All cities annotated with place count — the FeaturedCitiesGrid client
-  // component picks the top 6 globally (or within an active continent chip).
-  const citiesWithCounts = cities.map((c) => ({
-    ...c,
-    _count: getPlacesInCity(c.webflow_id).length,
-  }));
+export default async function HomePage() {
+  const [cities, categories, allPlaces] = await Promise.all([
+    getAllCities(),
+    getAllCategories(),
+    getAllPlaces(),
+  ]);
+  const totalPlaces = allPlaces.length;
 
-  // Trending pool: up to 3 places per city across all 35 cities → ~100
-  // candidate places, plenty of variety for client-side category filtering
-  // and reshuffles.
-  const pool: PlaceWithRefs[] = citiesWithCounts
-    .flatMap((c) => {
-      const cityPlaces = getAllPlaces().filter((p) => p.city_webflow_id === c.webflow_id);
-      return cityPlaces
-        .slice(0, 3)
-        .map((p) => getPlaceBySlug(p.slug))
-        .filter((p): p is PlaceWithRefs => !!p);
-    });
+  const citiesWithCountsArr = await Promise.all(
+    cities.map(async (c) => ({
+      ...c,
+      _count: (await getPlacesInCity(c.webflow_id)).length,
+    })),
+  );
+
+  // Trending pool: up to 3 places per city across all cities.
+  const pool: PlaceWithRefs[] = (
+    await Promise.all(
+      citiesWithCountsArr.flatMap((c) =>
+        allPlaces
+          .filter((p) => p.city_webflow_id === c.webflow_id)
+          .slice(0, 3)
+          .map((p) => getPlaceBySlug(p.slug)),
+      ),
+    )
+  ).filter((p): p is PlaceWithRefs => !!p);
+
+  const citiesWithCounts = citiesWithCountsArr;
 
   return (
     <>

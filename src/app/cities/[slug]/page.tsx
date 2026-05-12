@@ -7,15 +7,16 @@ import { Gallery } from "@/components/Gallery";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 import { CityFeatureLinks } from "@/components/CityFeatureLinks";
 
-export const dynamicParams = false;
+export const dynamicParams = true;
+export const revalidate = 120;
 
-export function generateStaticParams() {
-  return getAllCities().map((c) => ({ slug: c.slug }));
+export async function generateStaticParams() {
+  return (await getAllCities()).map((c) => ({ slug: c.slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const city = getCityBySlug(slug);
+  const city = await getCityBySlug(slug);
   if (!city) return {};
   return {
     title: `TOP 10 - ${city.h1 ?? city.name} (${new Date().getFullYear()})`,
@@ -31,9 +32,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CityPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const city = getCityBySlug(slug);
+  const city = await getCityBySlug(slug);
   if (!city) return notFound();
-  const places = getPlacesInCity(city.webflow_id);
+  const [places, allCategories] = await Promise.all([
+    getPlacesInCity(city.webflow_id),
+    getAllCategories(),
+  ]);
 
   const itemListLd = {
     "@context": "https://schema.org",
@@ -122,7 +126,7 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
           <h2 className="text-2xl md:text-3xl font-bold mb-6">
             {places.length} specialty coffee spots in {city.name}
           </h2>
-          <PlaceFilters places={places} mode="city" categories={getAllCategories()} />
+          <PlaceFilters places={places} mode="city" categories={allCategories} />
         </div>
       </section>
 

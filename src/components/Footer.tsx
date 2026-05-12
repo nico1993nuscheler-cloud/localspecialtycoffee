@@ -14,10 +14,15 @@ const TAGLINE_BY_CITY: Record<string, string> = {
   "best-coffee-shops-in-paris-france": "Paris cafés worth the detour",
 };
 
-export function Footer() {
-  const cities = getAllCities();
-  const featuredFooterCities = cities
-    .map((c) => ({ ...c, _count: getPlacesInCity(c.webflow_id).length }))
+export async function Footer() {
+  const cities = await getAllCities();
+  const withCounts = await Promise.all(
+    cities.map(async (c) => ({
+      ...c,
+      _count: (await getPlacesInCity(c.webflow_id)).length,
+    })),
+  );
+  const featuredFooterCities = withCounts
     .sort((a, b) => b._count - a._count)
     .slice(0, 3);
 

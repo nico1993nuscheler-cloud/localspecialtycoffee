@@ -11,15 +11,16 @@ import { LANDING_FEATURES, FEATURE_BY_SLUG } from "@/lib/landing-features";
 import { PlaceCard } from "@/components/PlaceCard";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 
-export const dynamicParams = false;
+export const dynamicParams = true;
+export const revalidate = 300;
 
-export function generateStaticParams() {
+export async function generateStaticParams() {
   const params: { slug: string; feature: string }[] = [];
-  for (const c of getAllCities()) {
+  const cities = await getAllCities();
+  for (const c of cities) {
+    const places = await getPlacesInCity(c.webflow_id);
     for (const f of LANDING_FEATURES) {
-      // Only generate combos that have ≥1 matching place — keeps thin pages
-      // out of the index and the sitemap.
-      const matches = getPlacesInCity(c.webflow_id).filter(
+      const matches = places.filter(
         (p) => (p as unknown as Record<string, boolean>)[f.boolean],
       );
       if (matches.length >= 1) {
@@ -36,7 +37,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string; feature: string }>;
 }): Promise<Metadata> {
   const { slug, feature } = await params;
-  const city = getCityBySlug(slug);
+  const city = await getCityBySlug(slug);
   const f = FEATURE_BY_SLUG[feature];
   if (!city || !f) return {};
 
@@ -59,11 +60,11 @@ export default async function CityFeaturePage({
   params: Promise<{ slug: string; feature: string }>;
 }) {
   const { slug, feature } = await params;
-  const city = getCityBySlug(slug);
+  const city = await getCityBySlug(slug);
   const f = FEATURE_BY_SLUG[feature];
   if (!city || !f) return notFound();
 
-  const allInCity = getPlacesInCity(city.webflow_id);
+  const allInCity = await getPlacesInCity(city.webflow_id);
   const matches = allInCity.filter(
     (p) => (p as unknown as Record<string, boolean>)[f.boolean],
   );

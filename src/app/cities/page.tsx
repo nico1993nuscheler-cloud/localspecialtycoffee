@@ -9,11 +9,16 @@ export const metadata: Metadata = {
   alternates: { canonical: "/cities" },
 };
 
-export default function CitiesPage() {
-  const cities = getAllCities().map((c) => ({
-    ...c,
-    _count: getPlacesInCity(c.webflow_id).length,
-  }));
+export const revalidate = 300;
+
+export default async function CitiesPage() {
+  const all = await getAllCities();
+  const cities = await Promise.all(
+    all.map(async (c) => ({
+      ...c,
+      _count: (await getPlacesInCity(c.webflow_id)).length,
+    })),
+  );
 
   return (
     <section className="py-12">
