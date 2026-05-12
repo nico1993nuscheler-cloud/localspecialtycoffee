@@ -22,11 +22,14 @@ const MAKE_WEBHOOK_URL = process.env.MAKE_WEBHOOK_URL;
 async function forwardToMake(tier: SubmissionTier, payload: Record<string, unknown>) {
   if (!MAKE_WEBHOOK_URL) return;
   try {
-    await fetch(MAKE_WEBHOOK_URL, {
+    const res = await fetch(MAKE_WEBHOOK_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ tier, payload, submitted_at: new Date().toISOString() }),
+      body: JSON.stringify({ ...payload, tier, submitted_at: new Date().toISOString() }),
     });
+    if (!res.ok) {
+      console.error("[make-forward] non-2xx", tier, res.status, await res.text());
+    }
   } catch (err) {
     console.error("[make-forward]", tier, err);
   }
