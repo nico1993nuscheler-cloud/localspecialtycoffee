@@ -1,8 +1,10 @@
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getAllCities, getCityBySlug, getPlacesInCity } from "@/lib/data";
+import { PlaceCard } from "@/components/PlaceCard";
+import { Gallery } from "@/components/Gallery";
+import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 
 export const dynamicParams = false;
 
@@ -53,7 +55,7 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
 
       {/* Hero */}
       <section className="relative">
-        <div className="aspect-[2880/1328] md:aspect-[2880/900] bg-blush relative">
+        <div className="relative aspect-[2880/1100] md:aspect-[2880/900] bg-blush">
           {city.featured_image_url && (
             <Image
               src={city.featured_image_url}
@@ -64,102 +66,59 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
               className="object-cover"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
           <div className="absolute inset-0 flex items-end">
-            <div className="max-w-6xl mx-auto px-6 pb-8 md:pb-12 text-white">
-              <h1 className="text-3xl md:text-5xl font-bold drop-shadow-lg">
+            <div className="max-w-6xl mx-auto px-6 pb-10 md:pb-14 text-white">
+              <h1 className="text-3xl md:text-6xl font-bold drop-shadow-lg leading-tight">
                 {city.h1 ?? city.name}
               </h1>
               {city.summary && (
-                <p className="mt-3 text-lg md:text-xl max-w-2xl drop-shadow">
-                  {city.summary}
-                </p>
+                <p className="mt-3 text-lg md:text-xl max-w-2xl drop-shadow">{city.summary}</p>
               )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* SEO paragraph */}
-      {(city.seo_h2 || city.seo_paragraph) && (
-        <section className="py-12">
-          <div className="max-w-3xl mx-auto px-6">
-            {city.seo_h2 && <h2 className="text-2xl font-bold mb-4">{city.seo_h2}</h2>}
+      {/* 2-column: SEO text left, gallery right */}
+      <section className="py-14">
+        <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-[1.5fr_1fr] gap-12 items-start">
+          <div>
+            {city.seo_h2 && <h2 className="text-2xl md:text-3xl font-bold mb-5">{city.seo_h2}</h2>}
             {city.seo_paragraph && (
               <div
-                className="prose-seo text-muted"
+                className="prose-seo text-muted text-base leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: city.seo_paragraph }}
               />
             )}
           </div>
-        </section>
-      )}
+          {city.photo_gallery && city.photo_gallery.length > 0 && (
+            <aside className="lg:sticky lg:top-24">
+              <h3 className="text-lg font-semibold mb-3">{city.name} in pictures</h3>
+              <Gallery urls={city.photo_gallery} label={city.name} />
+            </aside>
+          )}
+        </div>
+      </section>
 
       {/* Place list */}
       <section className="py-8">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-2xl font-bold mb-6">
+          <h2 className="text-2xl md:text-3xl font-bold mb-8">
             {places.length} specialty coffee spots in {city.name}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {places.map((p) => (
-              <Link
-                key={p.webflow_id}
-                href={`/specialty-coffee-place/${p.slug}`}
-                className="group bg-white rounded-2xl overflow-hidden border border-blush hover:border-coral transition-all"
-              >
-                <div className="aspect-square bg-blush relative">
-                  {p.thumbnail_v1_url && (
-                    <Image
-                      src={p.thumbnail_v1_url}
-                      alt={p.name}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover group-hover:scale-105 transition-transform"
-                    />
-                  )}
-                  {p.is_featured && (
-                    <span className="absolute top-3 left-3 bg-coral text-white text-xs font-bold uppercase px-2 py-1 rounded-full">
-                      Featured
-                    </span>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-lg">{p.name}</h3>
-                  {p.flavour_profile && (
-                    <p className="text-sm text-muted line-clamp-2 mt-1">{p.flavour_profile}</p>
-                  )}
-                  <p className="text-xs text-coral mt-2 font-medium">
-                    {p.category.name} · {p.rating || "—"}
-                  </p>
-                </div>
-              </Link>
+              <PlaceCard key={p.webflow_id} place={p} />
             ))}
           </div>
         </div>
       </section>
 
-      {/* Photo gallery */}
-      {city.photo_gallery && city.photo_gallery.length > 0 && (
-        <section className="py-12">
-          <div className="max-w-6xl mx-auto px-6">
-            <h2 className="text-2xl font-bold mb-6">{city.name} in pictures</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {city.photo_gallery.map((url, i) => (
-                <div key={i} className="aspect-square bg-blush rounded-lg overflow-hidden relative">
-                  <Image
-                    src={url}
-                    alt={`${city.name} ${i + 1}`}
-                    fill
-                    sizes="(max-width: 768px) 50vw, 25vw"
-                    className="object-cover"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+      {/* Brewtiful Guide CTA */}
+      <div className="py-14">
+        <BrewtifulGuide />
+      </div>
     </>
   );
 }

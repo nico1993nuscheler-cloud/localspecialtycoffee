@@ -2,7 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getAllPlaces, getPlaceBySlug } from "@/lib/data";
+import { getAllPlaces, getPlaceBySlug, getPlacesInCity } from "@/lib/data";
+import { PlaceCard } from "@/components/PlaceCard";
+import { PlaceCTAs } from "@/components/PlaceCTAs";
+import { Gallery } from "@/components/Gallery";
+import { BrewtifulGuide } from "@/components/BrewtifulGuide";
+import { GOOGLE_MAPS_EMBED_KEY } from "@/lib/brand";
 
 export const dynamicParams = false;
 
@@ -81,6 +86,10 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
   const p = getPlaceBySlug(slug);
   if (!p) return notFound();
 
+  const otherPlaces = getPlacesInCity(p.city_webflow_id)
+    .filter((o) => o.webflow_id !== p.webflow_id)
+    .slice(0, 3);
+
   const localBusinessLd = {
     "@context": "https://schema.org",
     "@type": "CafeOrCoffeeShop",
@@ -91,6 +100,9 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
     url: p.website,
     telephone: p.phone,
   };
+
+  const mapsQuery = encodeURIComponent(`${p.name} ${p.address ?? ""} ${p.city.name}`);
+  const mapsEmbedSrc = `https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_EMBED_KEY}&q=${mapsQuery}`;
 
   return (
     <>
@@ -103,9 +115,7 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
       <nav className="max-w-6xl mx-auto px-6 pt-6 text-sm text-muted">
         <Link href="/" className="hover:text-coral">Home</Link>
         {" / "}
-        <Link href={`/cities/${p.city.slug}`} className="hover:text-coral">
-          {p.city.name}
-        </Link>
+        <Link href={`/cities/${p.city.slug}`} className="hover:text-coral">{p.city.name}</Link>
         {" / "}
         <span className="text-ink">{p.name}</span>
       </nav>
@@ -126,13 +136,13 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-6 py-8 grid lg:grid-cols-3 gap-10">
+      <section className="max-w-6xl mx-auto px-6 py-10 grid lg:grid-cols-3 gap-10">
         <div className="lg:col-span-2">
           <div className="flex items-start justify-between gap-4 mb-4">
             <div>
-              <p className="text-sm text-coral font-medium">{p.category.name}</p>
-              <h1 className="text-3xl md:text-4xl font-bold">{p.name}</h1>
-              {p.rating && <p className="text-sm text-muted mt-1">★ {p.rating}</p>}
+              <p className="text-sm text-coral font-medium uppercase tracking-wider">{p.category.name}</p>
+              <h1 className="text-3xl md:text-5xl font-bold leading-tight mt-1">{p.name}</h1>
+              {p.rating && <p className="text-sm text-muted mt-2">★ {p.rating}</p>}
             </div>
             {p.is_featured && (
               <span className="bg-coral text-white text-xs font-bold uppercase px-3 py-1 rounded-full whitespace-nowrap">
@@ -161,10 +171,7 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
                   <h3 className="font-semibold mb-3">{group.label}</h3>
                   <ul className="flex flex-wrap gap-2">
                     {active.map((i) => (
-                      <li
-                        key={i.key}
-                        className="text-sm bg-blush rounded-full px-3 py-1"
-                      >
+                      <li key={i.key} className="text-sm bg-blush rounded-full px-3 py-1">
                         {i.label}
                       </li>
                     ))}
@@ -174,32 +181,40 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
             })}
           </div>
 
-          {/* Gallery (premium only) */}
-          {p.photo_gallery && p.photo_gallery.length > 0 && (
-            <div className="mt-10">
-              <h3 className="font-semibold mb-3">Gallery</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {p.photo_gallery.map((url, i) => (
-                  <div key={i} className="aspect-square bg-blush rounded-lg overflow-hidden relative">
-                    <Image
-                      src={url}
-                      alt={`${p.name} ${i + 1}`}
-                      fill
-                      sizes="(max-width: 768px) 50vw, 25vw"
-                      className="object-cover"
-                    />
-                  </div>
-                ))}
+          {/* Google Maps embed */}
+          {p.address && (
+            <div className="mt-12">
+              <h3 className="font-semibold mb-3">Find {p.name}</h3>
+              <div className="rounded-2xl overflow-hidden border border-blush">
+                <iframe
+                  src={mapsEmbedSrc}
+                  width="100%"
+                  height="400"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  allowFullScreen
+                  style={{ border: 0 }}
+                  title={`Map of ${p.name} in ${p.city.name}`}
+                />
               </div>
+              <p className="text-sm text-muted mt-2">{p.address}</p>
+            </div>
+          )}
+
+          {/* Gallery (premium) */}
+          {p.photo_gallery && p.photo_gallery.length > 0 && (
+            <div className="mt-12">
+              <h3 className="font-semibold mb-3">Gallery</h3>
+              <Gallery urls={p.photo_gallery} label={p.name} />
             </div>
           )}
         </div>
 
         {/* Sidebar */}
-        <aside className="space-y-6">
-          <div className="bg-white rounded-2xl border border-blush p-6">
-            <h3 className="font-semibold mb-3">Visit</h3>
-            {p.address && <p className="text-sm text-muted mb-3">{p.address}</p>}
+        <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+          <div className="bg-white rounded-2xl border border-blush p-6 space-y-3">
+            <h3 className="font-semibold">Visit</h3>
+            {p.address && <p className="text-sm text-muted">{p.address}</p>}
             {p.hours_weekday && (
               <p className="text-sm"><span className="font-medium">Mon–Fri:</span> {p.hours_weekday}</p>
             )}
@@ -209,37 +224,49 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
             {p.hours_sunday && (
               <p className="text-sm"><span className="font-medium">Sun:</span> {p.hours_sunday}</p>
             )}
-          </div>
-          <div className="bg-white rounded-2xl border border-blush p-6 space-y-2">
-            {p.website && (
-              <a href={p.website} target="_blank" rel="noopener noreferrer"
-                className="block rounded-full bg-coral text-white text-center px-4 py-2 font-medium hover:bg-coral-300">
-                {p.button_text || "Visit website"}
-              </a>
-            )}
-            {p.booking_link && (
-              <a href={p.booking_link} target="_blank" rel="noopener noreferrer"
-                className="block rounded-full border border-ink text-center px-4 py-2 font-medium hover:bg-blush">
-                Book / get tickets
-              </a>
-            )}
-            {p.instagram && (
-              <a href={p.instagram} target="_blank" rel="noopener noreferrer"
-                className="block text-sm text-coral text-center hover:underline">
-                Instagram
-              </a>
-            )}
             {p.phone && <p className="text-sm text-muted">{p.phone}</p>}
-            {p.email && <p className="text-sm text-muted">{p.email}</p>}
+            {p.email && <p className="text-sm text-muted break-words">{p.email}</p>}
           </div>
           <div className="bg-white rounded-2xl border border-blush p-6">
-            <p className="text-sm">
-              In <Link href={`/cities/${p.city.slug}`} className="text-coral hover:underline">{p.city.name}</Link>{" "}
-              · <Link href={`/categories/${p.category.slug}`} className="text-coral hover:underline">{p.category.name}</Link>
+            <PlaceCTAs place={p} />
+          </div>
+          <div className="bg-white rounded-2xl border border-blush p-6 text-sm">
+            <p>
+              In <Link href={`/cities/${p.city.slug}`} className="text-coral hover:underline font-medium">{p.city.name}</Link>{" "}
+              · <Link href={`/categories/${p.category.slug}`} className="text-coral hover:underline font-medium">{p.category.name}</Link>
             </p>
           </div>
         </aside>
       </section>
+
+      {/* Brewtiful Guide */}
+      <div className="py-10">
+        <BrewtifulGuide />
+      </div>
+
+      {/* Other places in city */}
+      {otherPlaces.length > 0 && (
+        <section className="py-14">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold">
+                Other coffee places in {p.city.name}
+              </h2>
+              <Link
+                href={`/cities/${p.city.slug}`}
+                className="text-sm font-medium text-coral hover:underline"
+              >
+                See all spots in {p.city.name} →
+              </Link>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {otherPlaces.map((o) => (
+                <PlaceCard key={o.webflow_id} place={o} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </>
   );
 }
