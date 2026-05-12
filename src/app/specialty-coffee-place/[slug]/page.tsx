@@ -7,7 +7,6 @@ import { PlaceCard } from "@/components/PlaceCard";
 import { PlaceCTAs } from "@/components/PlaceCTAs";
 import { Gallery } from "@/components/Gallery";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
-import { GOOGLE_MAPS_EMBED_KEY } from "@/lib/brand";
 
 export const dynamicParams = false;
 
@@ -101,8 +100,10 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
     telephone: p.phone,
   };
 
+  // Keyless Google Maps embed — works without the API-key referrer restriction
+  // that prevented the Webflow key from rendering on non-www domains.
   const mapsQuery = encodeURIComponent(`${p.name} ${p.address ?? ""} ${p.city.name}`);
-  const mapsEmbedSrc = `https://www.google.com/maps/embed/v1/place?key=${GOOGLE_MAPS_EMBED_KEY}&q=${mapsQuery}`;
+  const mapsEmbedSrc = `https://maps.google.com/maps?q=${mapsQuery}&output=embed&z=15`;
 
   return (
     <>

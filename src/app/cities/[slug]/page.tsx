@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getAllCities, getCityBySlug, getPlacesInCity } from "@/lib/data";
-import { PlaceCard } from "@/components/PlaceCard";
+import { getAllCategories, getAllCities, getCityBySlug, getPlacesInCity } from "@/lib/data";
+import { PlaceFilters } from "@/components/PlaceFilters";
 import { Gallery } from "@/components/Gallery";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 
@@ -101,17 +101,13 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
         </div>
       </section>
 
-      {/* Place list */}
+      {/* Place list with filters */}
       <section className="py-8">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="text-2xl md:text-3xl font-bold mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6">
             {places.length} specialty coffee spots in {city.name}
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {places.map((p) => (
-              <PlaceCard key={p.webflow_id} place={p} />
-            ))}
-          </div>
+          <PlaceFilters places={places} mode="city" categories={getAllCategories()} />
         </div>
       </section>
 

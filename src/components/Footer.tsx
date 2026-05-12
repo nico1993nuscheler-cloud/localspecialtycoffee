@@ -2,62 +2,137 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { NewsletterForm } from "@/components/NewsletterForm";
+import { getAllCities, getPlacesInCity } from "@/lib/data";
+
+const TAGLINE_BY_CITY: Record<string, string> = {
+  "best-coffee-shops-in-new-york": "Explore NY's specialty coffee scene",
+  "best-coffee-shops-in-london": "Explore London's unique coffee roasters",
+  "specialty-coffee-berlin": "Explore Berlin's coffee scene",
+  "best-coffee-in-amsterdam": "Discover Amsterdam's top spots",
+  "best-coffee-in-melbourne": "Coffee-mad Melbourne, mapped",
+  "best-coffee-shops-in-paris-france": "Paris cafés worth the detour",
+};
 
 export function Footer() {
+  const cities = getAllCities();
+  const featuredFooterCities = cities
+    .map((c) => ({ ...c, _count: getPlacesInCity(c.webflow_id).length }))
+    .sort((a, b) => b._count - a._count)
+    .slice(0, 3);
+
   return (
-    <footer className="bg-ink text-white mt-20">
-      <div className="max-w-7xl mx-auto px-6 py-14 grid grid-cols-1 md:grid-cols-4 gap-10">
-        <div>
-          <Link href="/" className="inline-block mb-4 bg-white rounded-xl p-3">
+    <footer className="bg-ink text-white mt-24">
+      <div className="max-w-7xl mx-auto px-6 pt-16 pb-10">
+
+        {/* Top link grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
+          <div>
+            <h3 className="text-xs font-semibold mb-4 uppercase tracking-wider text-coral">
+              Discover Specialty Coffee
+            </h3>
+            <ul className="space-y-2.5 text-sm">
+              <li><Link href="/categories/specialty-coffee-shops" className="hover:text-coral transition-colors">Specialty Coffee Shops</Link></li>
+              <li><Link href="/categories/coffee-roasters" className="hover:text-coral transition-colors">Coffee Roasters</Link></li>
+              <li><Link href="/categories/barista-course" className="hover:text-coral transition-colors">Barista Courses</Link></li>
+              <li><Link href="/cities" className="hover:text-coral transition-colors">Discover Cities</Link></li>
+              <li><Link href="/submissions" className="hover:text-coral transition-colors">Submit a Spot</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-xs font-semibold mb-4 uppercase tracking-wider text-coral">
+              New cities added
+            </h3>
+            <ul className="space-y-3">
+              {featuredFooterCities.map((c) => (
+                <li key={c.slug}>
+                  <Link
+                    href={`/cities/${c.slug}`}
+                    className="group flex items-center gap-3"
+                  >
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
+                      {c.thumbnail_v3_url && (
+                        <Image
+                          src={c.thumbnail_v3_url}
+                          alt={c.name}
+                          fill
+                          sizes="48px"
+                          className="object-cover"
+                        />
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-sm group-hover:text-coral transition-colors leading-tight">
+                        {c.name}
+                      </p>
+                      <p className="text-xs text-white/55 leading-tight mt-0.5 line-clamp-1">
+                        {TAGLINE_BY_CITY[c.slug] ?? `${c._count} curated spots`}
+                      </p>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-xs font-semibold mb-4 uppercase tracking-wider text-coral">
+              Localspecialtycoffee.com
+            </h3>
+            <ul className="space-y-2.5 text-sm">
+              <li><Link href="/about" className="hover:text-coral transition-colors">About</Link></li>
+              <li><Link href="/contact" className="hover:text-coral transition-colors">Contact</Link></li>
+              <li><Link href="/faqs" className="hover:text-coral transition-colors">FAQs</Link></li>
+              <li><Link href="/submissions" className="hover:text-coral transition-colors">Submissions</Link></li>
+              <li><Link href="/terms-conditions" className="hover:text-coral transition-colors">Terms &amp; Conditions</Link></li>
+              <li><Link href="/terms-conditions" className="hover:text-coral transition-colors">Imprint</Link></li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Newsletter strip */}
+        <div className="rounded-3xl bg-[#1a1a1a] border border-white/10 p-6 md:p-8 grid md:grid-cols-[1.1fr_1fr] gap-8 items-center mb-10">
+          <div className="flex items-start gap-4">
             <Image
-              src={BRAND.logo}
-              alt="Local Specialty Coffee"
-              width={150}
-              height={53}
+              src={BRAND.newsletterIcon}
+              alt=""
+              width={48}
+              height={48}
               unoptimized
-              className="h-12 w-auto"
+              className="shrink-0"
             />
+            <div>
+              <h3 className="text-xl md:text-2xl font-bold mb-1">Brew-tiful News! ☕</h3>
+              <p className="text-sm text-white/65 max-w-md">
+                Get access to the Google Maps list, receive city updates, bean
+                stories &amp; subscriber-only deals.
+              </p>
+            </div>
+          </div>
+          <div className="bg-white p-1 rounded-full">
+            <NewsletterForm tier="lead_magnet" cta="Subscribe" />
+          </div>
+        </div>
+
+        {/* Brand + copyright row */}
+        <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <Link href="/" className="inline-flex">
+            <span className="bg-white rounded-lg p-2.5">
+              <Image
+                src={BRAND.logo}
+                alt="Local Specialty Coffee"
+                width={140}
+                height={50}
+                unoptimized
+                className="h-10 w-auto"
+              />
+            </span>
           </Link>
-          <p className="text-sm text-white/70">
-            A curated guide to the world&apos;s best specialty coffee shops,
-            roasters & brew bars. Discover dangerously good cups, anywhere.
+          <p className="text-xs text-white/55">
+            © {new Date().getFullYear()} Local Specialty Coffee · Crafted with ☕ for coffee lovers worldwide
           </p>
         </div>
-        <div>
-          <h3 className="text-sm font-semibold mb-3 uppercase tracking-wider">Explore</h3>
-          <ul className="space-y-2 text-sm text-white/70">
-            <li><Link href="/cities" className="hover:text-coral">All cities</Link></li>
-            <li><Link href="/categories/specialty-coffee-shops" className="hover:text-coral">Specialty coffee shops</Link></li>
-            <li><Link href="/categories/coffee-roasters" className="hover:text-coral">Coffee roasters</Link></li>
-            <li><Link href="/categories/barista-course" className="hover:text-coral">Barista courses</Link></li>
-          </ul>
-        </div>
-        <div>
-          <h3 className="text-sm font-semibold mb-3 uppercase tracking-wider">About</h3>
-          <ul className="space-y-2 text-sm text-white/70">
-            <li><Link href="/about" className="hover:text-coral">About us</Link></li>
-            <li><Link href="/contact" className="hover:text-coral">Contact</Link></li>
-            <li><Link href="/faqs" className="hover:text-coral">FAQs</Link></li>
-            <li><Link href="/submissions" className="hover:text-coral">Submit a Spot</Link></li>
-            <li><Link href="/terms-conditions" className="hover:text-coral">Terms &amp; Conditions</Link></li>
-          </ul>
-        </div>
-        <div>
-          <h3 className="text-sm font-semibold mb-3 uppercase tracking-wider flex items-center gap-2">
-            <Image src={BRAND.newsletterIcon} alt="" width={20} height={20} unoptimized />
-            Newsletter
-          </h3>
-          <p className="text-sm text-white/70 mb-3">
-            New cities, new spots, and the occasional brewing tip. Once a week, max.
-          </p>
-          <NewsletterForm tier="newsletter" cta="Subscribe" />
-        </div>
-      </div>
-      <div className="border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-6 py-5 text-xs text-white/50 flex flex-col md:flex-row justify-between gap-2">
-          <span>© {new Date().getFullYear()} Local Specialty Coffee</span>
-          <span>Crafted with ☕ for coffee lovers worldwide</span>
-        </div>
+
       </div>
     </footer>
   );

@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getAllCategories, getCategoryBySlug, getPlacesInCategory } from "@/lib/data";
-import { PlaceCard } from "@/components/PlaceCard";
+import { getAllCategories, getAllCities, getCategoryBySlug, getPlacesInCategory } from "@/lib/data";
+import { PlaceFilters } from "@/components/PlaceFilters";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 
 export const dynamicParams = false;
@@ -27,6 +27,10 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   const cat = getCategoryBySlug(slug);
   if (!cat) return notFound();
   const places = getPlacesInCategory(cat.webflow_id);
+  // Only show cities that actually have a place in this category in the dropdown.
+  const citiesWithPlaces = getAllCities().filter((c) =>
+    places.some((p) => p.city.slug === c.slug),
+  );
 
   return (
     <>
@@ -39,15 +43,18 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
             <h1 className="text-4xl md:text-5xl font-bold">{cat.name}s</h1>
           </div>
           {cat.description && (
-            <p className="text-lg text-muted mb-12 max-w-2xl">{cat.description}</p>
+            <p className="text-lg text-muted mb-10 max-w-2xl">{cat.description}</p>
           )}
 
-          <h2 className="text-xl font-semibold mb-6">{places.length} {cat.name.toLowerCase()}s worldwide</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {places.map((p) => (
-              <PlaceCard key={p.webflow_id} place={p} showCity />
-            ))}
-          </div>
+          <h2 className="text-xl font-semibold mb-6">
+            {places.length} {cat.name.toLowerCase()}s worldwide
+          </h2>
+          <PlaceFilters
+            places={places}
+            mode="category"
+            cities={citiesWithPlaces}
+            showCityOnCard
+          />
         </div>
       </section>
 
