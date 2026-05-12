@@ -16,10 +16,18 @@ export default function HomePage() {
     .sort((a, b) => b._count - a._count)
     .slice(0, 6);
 
-  // Pick 3 featured places across cities for the "highlight" section
-  const featuredPlaces = getAllPlaces()
-    .filter((p) => p.is_featured)
-    .slice(0, 6);
+  // Spotlight section — prefer is_featured flags if any are set; otherwise
+  // surface 6 fresh places from the biggest cities so the section never empties.
+  const allPlaces = getAllPlaces();
+  const flagged = allPlaces.filter((p) => p.is_featured);
+  const spotlightSource =
+    flagged.length >= 3
+      ? flagged
+      : featuredCities.flatMap((c) =>
+          allPlaces.filter((p) => p.city_webflow_id === c.webflow_id).slice(0, 1),
+        );
+  const featuredPlaces = spotlightSource.slice(0, 6);
+  const spotlightHeading = flagged.length >= 3 ? "Featured spots" : "Trending right now";
 
   return (
     <>
@@ -102,7 +110,7 @@ export default function HomePage() {
       {featuredPlaces.length > 0 && (
         <section className="py-12 bg-blush/30">
           <div className="max-w-6xl mx-auto px-6">
-            <h2 className="text-3xl md:text-4xl font-bold mb-10 text-center">Featured spots</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-10 text-center">{spotlightHeading}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {featuredPlaces.map((p) => {
                 const place = {
