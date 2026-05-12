@@ -1,14 +1,11 @@
 "use server";
 
-// Server Actions for all 5 forms. v1 logs submission server-side and (optionally)
-// forwards to a Make.com webhook. Phase 4 will swap to Supabase inserts + Resend.
-//
-// Why this is enough for v1:
-// - Webflow stops receiving submissions the moment DNS cuts over, so we just need
-//   to not lose any leads.
-// - Console log + Make.com forwarding covers both internal tracking and the
-//   existing "Brew-tiful Guide" lead-magnet email automation.
-// - Replacing with Supabase + Resend is mechanical and zero-SEO-risk later.
+// Server Actions for all 5 forms.
+// - Newsletter + lead-magnet signups: added directly to MailerLite. MailerLite's
+//   "subscriber joined group" automation fires the "Brew-tiful Guide" email.
+// - Contact / free / premium submissions: logged server-side. View in Vercel
+//   runtime logs. (No autoresponder needed for these.)
+// - Optional Make.com forward kept as a no-op when MAKE_WEBHOOK_URL is unset.
 
 type SubmissionTier = "contact" | "submission_free" | "submission_premium" | "lead_magnet" | "newsletter";
 
@@ -18,6 +15,35 @@ export type FormState =
   | { status: "error"; message: string };
 
 const MAKE_WEBHOOK_URL = process.env.MAKE_WEBHOOK_URL;
+const MAILERLITE_API_KEY = process.env.MAILERLITE_API_KEY;
+const MAILERLITE_GROUP_ID = process.env.MAILERLITE_GROUP_ID;
+
+async function addToMailerLite(tier: SubmissionTier, email: string) {
+  if (!MAILERLITE_API_KEY || !MAILERLITE_GROUP_ID) {
+    console.error("[mailerlite] missing MAILERLITE_API_KEY or MAILERLITE_GROUP_ID");
+    return;
+  }
+  try {
+    const res = await fetch("https://connect.mailerlite.com/api/subscribers", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${MAILERLITE_API_KEY}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        groups: [MAILERLITE_GROUP_ID],
+        fields: { source: tier },
+      }),
+    });
+    if (!res.ok) {
+      console.error("[mailerlite] non-2xx", tier, res.status, await res.text());
+    }
+  } catch (err) {
+    console.error("[mailerlite]", tier, err);
+  }
+}
 
 async function forwardToMake(tier: SubmissionTier, payload: Record<string, unknown>) {
   if (!MAKE_WEBHOOK_URL) return;
@@ -71,7 +97,7 @@ export async function subscribeLeadMagnet(_prev: FormState, formData: FormData):
     return { status: "error", message: "Please enter a valid email." };
   }
   console.log("[lead_magnet]", { email });
-  await forwardToMake("lead_magnet", { email });
+  await addToMailerLite("lead_magnet", email);
   return { status: "ok", message: "Thanks for submitting - check your email!" };
 }
 
@@ -81,6 +107,6 @@ export async function subscribeNewsletter(_prev: FormState, formData: FormData):
     return { status: "error", message: "Please enter a valid email." };
   }
   console.log("[newsletter]", { email });
-  await forwardToMake("newsletter", { email });
+  await addToMailerLite("newsletter", email);
   return { status: "ok", message: "Thanks for submitting - check your email!" };
 }
