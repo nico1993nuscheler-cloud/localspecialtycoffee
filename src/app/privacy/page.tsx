@@ -114,15 +114,21 @@ export default function PrivacyPage() {
           .
         </p>
 
-        <h2 className="text-2xl font-bold mt-10">5. Cookie consent (Silktide)</h2>
+        <h2 className="text-2xl font-bold mt-10">5. Cookie consent</h2>
         <p>
-          We use the Silktide Consent Manager to obtain and manage your cookie
-          consent. The consent manager stores your preferences in a first-party
-          cookie. No personal data is processed beyond this local preference.
+          We use a first-party consent banner to obtain and manage your
+          preferences. Your choice is stored in your browser&apos;s local
+          storage under the key <code>lsc-consent-v1</code> and never leaves
+          your device. No personal data is processed beyond this local
+          preference.
         </p>
         <p>
-          <strong>Legal basis:</strong> Art. 6 (1) (c) GDPR (legal obligation per
-          TTDSG / ePrivacy).
+          You can change or withdraw consent at any time via the &ldquo;Cookie
+          settings&rdquo; link in the footer.
+        </p>
+        <p>
+          <strong>Legal basis:</strong> Art. 6 (1) (c) GDPR (legal obligation
+          per TTDSG / ePrivacy).
         </p>
 
         <h2 className="text-2xl font-bold mt-10">6. Newsletter (MailerLite + Make)</h2>

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { CookieConsent } from "@/components/CookieConsent";
 
 const DEFAULT_OG_IMAGE =
   "https://cdn.prod.website-files.com/67d40637d300a0e9ce062510/67ec41bcc721c1659c005b6c_Specialty_Coffee_Map_Visual%20(2).png";
@@ -28,8 +28,6 @@ export const metadata: Metadata = {
     canonical: "/",
   },
 };
-
-const GA_ID = "G-MJYKNFPEZ6";
 
 export default function RootLayout({
   children,
@@ -67,25 +65,9 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
         <Footer />
 
-        {/* Silktide cookie consent (mirrors current Webflow setup) */}
-        <Script
-          src="https://storage.googleapis.com/localspecialtycoffee-public-web-assets/silktide-consent-manager.js"
-          strategy="afterInteractive"
-        />
-
-        {/* Google Analytics 4 — same property as current Webflow site */}
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script id="ga4-init" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', '${GA_ID}');
-          `}
-        </Script>
+        {/* Cookie consent — gates GA4 loading; replaces the Webflow-era
+         * Silktide script which never rendered a banner on the new stack. */}
+        <CookieConsent />
       </body>
     </html>
   );

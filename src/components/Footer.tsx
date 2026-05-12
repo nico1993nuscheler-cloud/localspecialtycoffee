@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { NewsletterForm } from "@/components/NewsletterForm";
+import { OpenCookieSettings } from "@/components/OpenCookieSettings";
 import { getAllCities, getPlacesInCity } from "@/lib/data";
 
 const TAGLINE_BY_CITY: Record<string, string> = {
@@ -110,6 +111,7 @@ export function Footer() {
               <li><Link href="/terms-conditions" className="hover:text-coral-bright transition-colors">Terms &amp; Conditions</Link></li>
               <li><Link href="/privacy" className="hover:text-coral-bright transition-colors">Privacy Policy</Link></li>
               <li><Link href="/imprint" className="hover:text-coral-bright transition-colors">Imprint</Link></li>
+              <li className="text-white/85"><OpenCookieSettings /></li>
             </ul>
           </div>
         </div>
