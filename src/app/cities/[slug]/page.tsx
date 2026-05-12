@@ -5,6 +5,7 @@ import { getAllCategories, getAllCities, getCityBySlug, getPlacesInCity } from "
 import { PlaceFilters } from "@/components/PlaceFilters";
 import { Gallery } from "@/components/Gallery";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
+import { CityFeatureLinks } from "@/components/CityFeatureLinks";
 
 export const dynamicParams = false;
 
@@ -124,6 +125,10 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
           <PlaceFilters places={places} mode="city" categories={getAllCategories()} />
         </div>
       </section>
+
+      {/* Programmatic-landing internal links — keep crawlers discovering
+       *  /cities/[slug]/[feature] from the city hub. */}
+      <CityFeatureLinks citySlug={city.slug} cityName={city.name} places={places} />
 
       {/* Brewtiful Guide CTA */}
       <div className="py-14">

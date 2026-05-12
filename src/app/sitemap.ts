@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
-import { getAllCities, getAllPlaces, getAllCategories } from "@/lib/data";
+import { getAllCities, getAllPlaces, getAllCategories, getPlacesInCity } from "@/lib/data";
+import { LANDING_FEATURES } from "@/lib/landing-features";
 
 const BASE = "https://www.localspecialtycoffee.com";
 
@@ -33,5 +34,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...staticPages, ...cityUrls, ...categoryUrls, ...placeUrls];
+  // Programmatic landing pages: only emit combos with ≥1 matching place.
+  const landingUrls: MetadataRoute.Sitemap = [];
+  for (const c of getAllCities()) {
+    const places = getPlacesInCity(c.webflow_id);
+    for (const f of LANDING_FEATURES) {
+      const count = places.filter(
+        (p) => (p as unknown as Record<string, boolean>)[f.boolean],
+      ).length;
+      if (count >= 1) {
+        landingUrls.push({
+          url: `${BASE}/cities/${c.slug}/${f.slug}`,
+          changeFrequency: "monthly",
+          priority: 0.65,
+        });
+      }
+    }
+  }
+
+  return [...staticPages, ...cityUrls, ...categoryUrls, ...placeUrls, ...landingUrls];
 }
