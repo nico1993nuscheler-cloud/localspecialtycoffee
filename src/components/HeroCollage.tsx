@@ -12,11 +12,11 @@ export function HeroCollage() {
   return (
     <div className="grid grid-cols-3 gap-3 md:gap-4">
       <div className="flex flex-col gap-3 md:gap-4 pt-8">
-        <ImgTile src={col1a} alt="Dark Matter Coffee, specialty roaster" />
+        <ImgTile src={col1a} alt="Dark Matter Coffee, specialty roaster" priority />
         <ImgTile src={col1b} alt="Bike and specialty coffee shop scene" tall />
       </div>
       <div className="flex flex-col gap-3 md:gap-4">
-        <ImgTile src={col2a} alt="Rosslyn Coffee, London" />
+        <ImgTile src={col2a} alt="Rosslyn Coffee, London" priority />
         <ImgTile src={col2b} alt="Party at Pavillon, Berlin" />
         <ImgTile src={col2c} alt="Praxis Coffee Roasters, Austin" />
       </div>
@@ -28,10 +28,27 @@ export function HeroCollage() {
   );
 }
 
-function ImgTile({ src, alt, tall = false }: { src: string; alt: string; tall?: boolean }) {
+function ImgTile({
+  src,
+  alt,
+  tall = false,
+  priority = false,
+}: {
+  src: string;
+  alt: string;
+  tall?: boolean;
+  priority?: boolean;
+}) {
   return (
     <div className={`relative overflow-hidden rounded-2xl bg-blush ${tall ? "aspect-[4/5]" : "aspect-square"}`}>
-      <Image src={src} alt={alt} fill sizes="(max-width: 768px) 33vw, 250px" className="object-cover" />
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes="(max-width: 768px) 33vw, 250px"
+        className="object-cover"
+        priority={priority}
+      />
     </div>
   );
 }

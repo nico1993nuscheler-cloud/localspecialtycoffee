@@ -1,11 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  --color-coral: #f36756;
+  /* Accessibility-tuned coral: original Webflow #f36756 fails WCAG AA
+   * (3.04:1 vs white). #cf483a passes at 4.55:1 — still recognizably the
+   * LSC coral but readable on white backgrounds and as button text. */
+  --color-coral: #cf483a;
   --color-coral-50: #fef3f1;
   --color-coral-100: #fde2dc;
   --color-coral-200: #f6c6c1;
-  --color-coral-300: #ea5240;
+  --color-coral-300: #b03325;
+  /* Original brand coral preserved for large headlines + decorative
+   * surfaces where lighter feel is wanted. */
+  --color-coral-bright: #f36756;
   --color-bg: #f8f5f6;
   --color-blush: #f7dddb;
   --color-ink: #1a1a1a;
