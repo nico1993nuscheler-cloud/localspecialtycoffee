@@ -10,3 +10,4 @@ out
 
 # Heavy raw Webflow snapshots (transformed JSON is what we use)
 data/snapshots/
+.env*.local
