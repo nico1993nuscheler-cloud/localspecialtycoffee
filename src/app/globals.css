@@ -6,10 +6,10 @@
   --color-white: #ffffff;
   --color-black: #000000;
 
-  /* Accessibility-tuned coral: original Webflow #f36756 fails WCAG AA
-   * (3.04:1 vs white). #cf483a passes at 4.55:1 — still recognizably the
-   * LSC coral but readable on white backgrounds and as button text. */
-  --color-coral: #cf483a;
+  /* Accessibility-tuned coral. Passes WCAG AA on BOTH pure white AND our
+   * #f8f5f6 cream page background (4.88:1 / 4.64:1). The original Webflow
+   * #f36756 fails on either. */
+  --color-coral: #c4422f;
   --color-coral-50: #fef3f1;
   --color-coral-100: #fde2dc;
   --color-coral-200: #f6c6c1;
