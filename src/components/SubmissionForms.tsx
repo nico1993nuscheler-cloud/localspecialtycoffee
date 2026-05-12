@@ -70,7 +70,7 @@ export function SubmissionFormFree() {
       <h3 className="text-xl font-semibold">Free listing</h3>
       <CommonFields />
       {state.status === "error" && <p className="text-sm text-coral">{state.message}</p>}
-      <button type="submit" disabled={pending} className="rounded-full bg-coral text-white px-6 py-3 font-medium hover:bg-coral-300 disabled:opacity-50 w-fit">
+      <button type="submit" disabled={pending} className="rounded-full bg-coral-bright text-ink px-6 py-3 font-bold hover:bg-coral hover:text-white disabled:opacity-50 w-fit">
         {pending ? "Submitting..." : "Submit free listing"}
       </button>
     </form>

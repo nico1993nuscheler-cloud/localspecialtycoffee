@@ -19,7 +19,7 @@ export function PlaceCTAs({ place }: { place: PlaceWithRefs }) {
           href={place.website}
           target="_blank"
           rel="noopener noreferrer"
-          className="block rounded-full bg-coral text-white text-center px-4 py-3 font-semibold hover:bg-coral-300 transition-colors"
+          className="block rounded-full bg-coral-bright text-ink text-center px-4 py-3 font-bold hover:bg-coral hover:text-white transition-colors"
         >
           Visit Website
         </a>

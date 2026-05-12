@@ -11,6 +11,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${BASE}/faqs`, changeFrequency: "yearly" as const, priority: 0.3 },
     { url: `${BASE}/terms-conditions`, changeFrequency: "yearly" as const, priority: 0.1 },
     { url: `${BASE}/submissions`, changeFrequency: "yearly" as const, priority: 0.4 },
+    { url: `${BASE}/privacy`, changeFrequency: "yearly" as const, priority: 0.2 },
+    { url: `${BASE}/imprint`, changeFrequency: "yearly" as const, priority: 0.1 },
   ];
 
   const cityUrls = getAllCities().map((c) => ({

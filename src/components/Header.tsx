@@ -40,7 +40,7 @@ export function Header() {
           <li>
             <Link
               href="/#city-search"
-              className="rounded-full bg-coral text-white px-5 py-2 hover:bg-coral-300 transition-colors"
+              className="rounded-full bg-coral-bright text-ink font-semibold px-5 py-2 hover:bg-coral hover:text-white transition-colors"
             >
               Search
             </Link>

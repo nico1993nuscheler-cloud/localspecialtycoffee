@@ -55,7 +55,7 @@ export default function HomePage() {
             </p>
             <Link
               href="#city-search"
-              className="inline-flex items-center gap-2 rounded-full bg-coral text-white px-7 py-3.5 font-semibold hover:bg-coral-300 hover:-translate-y-0.5 transition-all shadow-md hover:shadow-lg"
+              className="inline-flex items-center gap-2 rounded-full bg-coral-bright text-ink px-7 py-3.5 font-bold hover:bg-coral hover:text-white hover:-translate-y-0.5 transition-all shadow-md hover:shadow-lg"
             >
               Find Specialty Coffee
               <span aria-hidden>→</span>

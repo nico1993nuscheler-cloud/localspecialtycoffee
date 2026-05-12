@@ -41,7 +41,7 @@ export function ContactForm() {
         <textarea name="message" required rows={5} placeholder="Leave us a message" className="mt-1 block w-full rounded-lg border border-blush bg-white px-3 py-2" />
       </label>
       {state.status === "error" && <p className="text-sm text-coral">{state.message}</p>}
-      <button type="submit" disabled={pending} className="rounded-full bg-coral text-white px-6 py-3 font-medium hover:bg-coral-300 transition-colors disabled:opacity-50 w-fit">
+      <button type="submit" disabled={pending} className="rounded-full bg-coral-bright text-ink px-6 py-3 font-bold hover:bg-coral hover:text-white transition-colors disabled:opacity-50 w-fit">
         {pending ? "Sending..." : "Send message"}
       </button>
     </form>

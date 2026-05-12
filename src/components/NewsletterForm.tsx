@@ -32,7 +32,7 @@ export function NewsletterForm({
       <button
         type="submit"
         disabled={pending}
-        className="rounded-full bg-coral text-white px-6 py-3 font-medium hover:bg-coral-300 transition-colors disabled:opacity-50 whitespace-nowrap"
+        className="rounded-full bg-coral-bright text-ink font-bold px-6 py-3 hover:bg-coral hover:text-white transition-colors disabled:opacity-50 whitespace-nowrap"
       >
         {pending ? "..." : buttonLabel}
       </button>

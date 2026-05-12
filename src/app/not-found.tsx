@@ -10,7 +10,7 @@ export default function NotFound() {
           The page you&apos;re looking for has been roasted into oblivion. Try one of these:
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link href="/" className="rounded-full bg-coral text-white px-6 py-3 font-medium hover:bg-coral-300 transition-colors">
+          <Link href="/" className="rounded-full bg-coral-bright text-ink px-6 py-3 font-bold hover:bg-coral hover:text-white transition-colors">
             Home
           </Link>
           <Link href="/cities" className="rounded-full border border-ink px-6 py-3 font-medium hover:bg-blush transition-colors">
