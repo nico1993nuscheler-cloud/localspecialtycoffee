@@ -141,7 +141,7 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
           {p.featured_image_url && (
             <Image
               src={p.featured_image_url}
-              alt={p.name}
+              alt={`${p.name} — ${p.category.name.toLowerCase()} in ${p.city.name}`}
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 80vw"

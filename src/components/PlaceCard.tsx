@@ -14,7 +14,7 @@ export function PlaceCard({ place, showCity = false }: { place: PlaceWithRefs; s
         {place.thumbnail_v3_url || place.featured_image_url ? (
           <Image
             src={place.thumbnail_v3_url ?? place.featured_image_url ?? ""}
-            alt={place.name}
+            alt={`${place.name} — ${place.category.name.toLowerCase()} in ${place.city.name}`}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover group-hover:scale-[1.02] transition-transform"

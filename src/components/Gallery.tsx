@@ -45,7 +45,7 @@ export function Gallery({ urls, label }: { urls: string[]; label: string }) {
           >
             <Image
               src={url}
-              alt={`${label} ${i + 1}`}
+              alt={`${label} — photo ${i + 1} of ${urls.length}`}
               fill
               sizes="(max-width: 768px) 50vw, 25vw"
               className="object-cover group-hover:scale-105 transition-transform"
