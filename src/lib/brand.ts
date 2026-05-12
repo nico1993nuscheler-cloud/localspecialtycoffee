@@ -26,9 +26,9 @@ export const BRAND = {
   // hard-coded here for stable lookup; the place-card pill always shows the
   // small cup icon for "Specialty Coffee Shop" by default).
   categoryIcons: {
-    "specialty-coffee-shops": `${CAT_CDN}/67e275bb08a5ef1fe0ec2b1a_Specialty%20coffee%20icon%20%20(1).svg`,
-    "coffee-roasters": `${CAT_CDN}/67e2767aac1a28f7ecb38ab3_Coffee%20Roaster%20Large%20Icon.svg`,
-    "barista-course": `${CAT_CDN}/67e2759d87bd4e92002b8008_Coffee%20Classes%20icon%20(2).svg`,
+    "specialty-coffee-shops": `https://1oeeb0zeqqw4lwi0.public.blob.vercel-storage.com/images/lsc/67e275bb08a5ef1fe0ec2b1a_Specialty-coffee-icon-1-.svg`,
+    "coffee-roasters": `https://1oeeb0zeqqw4lwi0.public.blob.vercel-storage.com/images/lsc/67e2767aac1a28f7ecb38ab3_Coffee-Roaster-Large-Icon.svg`,
+    "barista-course": `https://1oeeb0zeqqw4lwi0.public.blob.vercel-storage.com/images/lsc/67e2759d87bd4e92002b8008_Coffee-Classes-icon-2-.svg`,
   } as Record<string, string>,
 };
 
