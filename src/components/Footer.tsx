@@ -50,20 +50,20 @@ export function Footer() {
         {/* 3-column links — tightened */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-8 mb-10">
           <div>
-            <h3 className="text-[11px] font-bold mb-3 uppercase tracking-wider text-coral">
+            <h3 className="text-[11px] font-bold mb-3 uppercase tracking-wider text-coral-bright">
               Discover Specialty Coffee
             </h3>
             <ul className="space-y-2 text-sm text-white/85">
-              <li><Link href="/categories/specialty-coffee-shops" className="hover:text-coral transition-colors">Specialty Coffee Shops</Link></li>
-              <li><Link href="/categories/coffee-roasters" className="hover:text-coral transition-colors">Coffee Roasters</Link></li>
-              <li><Link href="/categories/barista-course" className="hover:text-coral transition-colors">Barista Courses</Link></li>
-              <li><Link href="/cities" className="hover:text-coral transition-colors">Discover Cities</Link></li>
-              <li><Link href="/submissions" className="hover:text-coral transition-colors">Submit a Spot</Link></li>
+              <li><Link href="/categories/specialty-coffee-shops" className="hover:text-coral-bright transition-colors">Specialty Coffee Shops</Link></li>
+              <li><Link href="/categories/coffee-roasters" className="hover:text-coral-bright transition-colors">Coffee Roasters</Link></li>
+              <li><Link href="/categories/barista-course" className="hover:text-coral-bright transition-colors">Barista Courses</Link></li>
+              <li><Link href="/cities" className="hover:text-coral-bright transition-colors">Discover Cities</Link></li>
+              <li><Link href="/submissions" className="hover:text-coral-bright transition-colors">Submit a Spot</Link></li>
             </ul>
           </div>
 
           <div>
-            <h3 className="text-[11px] font-bold mb-3 uppercase tracking-wider text-coral">
+            <h3 className="text-[11px] font-bold mb-3 uppercase tracking-wider text-coral-bright">
               New cities added
             </h3>
             <ul className="space-y-2">
@@ -85,7 +85,7 @@ export function Footer() {
                       )}
                     </div>
                     <div className="min-w-0">
-                      <p className="font-semibold text-sm group-hover:text-coral transition-colors leading-tight">
+                      <p className="font-semibold text-sm group-hover:text-coral-bright transition-colors leading-tight">
                         {c.name}
                       </p>
                       <p className="text-xs text-white/50 leading-tight mt-0.5 line-clamp-1">
@@ -99,15 +99,15 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="text-[11px] font-bold mb-3 uppercase tracking-wider text-coral">
+            <h3 className="text-[11px] font-bold mb-3 uppercase tracking-wider text-coral-bright">
               Localspecialtycoffee.com
             </h3>
             <ul className="space-y-2 text-sm text-white/85">
-              <li><Link href="/about" className="hover:text-coral transition-colors">About</Link></li>
-              <li><Link href="/contact" className="hover:text-coral transition-colors">Contact</Link></li>
-              <li><Link href="/faqs" className="hover:text-coral transition-colors">FAQs</Link></li>
-              <li><Link href="/submissions" className="hover:text-coral transition-colors">Submissions</Link></li>
-              <li><Link href="/terms-conditions" className="hover:text-coral transition-colors">Terms &amp; Conditions</Link></li>
+              <li><Link href="/about" className="hover:text-coral-bright transition-colors">About</Link></li>
+              <li><Link href="/contact" className="hover:text-coral-bright transition-colors">Contact</Link></li>
+              <li><Link href="/faqs" className="hover:text-coral-bright transition-colors">FAQs</Link></li>
+              <li><Link href="/submissions" className="hover:text-coral-bright transition-colors">Submissions</Link></li>
+              <li><Link href="/terms-conditions" className="hover:text-coral-bright transition-colors">Terms &amp; Conditions</Link></li>
             </ul>
           </div>
         </div>
