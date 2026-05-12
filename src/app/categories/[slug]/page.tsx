@@ -32,8 +32,21 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     places.some((p) => p.city.slug === c.slug),
   );
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.localspecialtycoffee.com/" },
+      { "@type": "ListItem", position: 2, name: `${cat.name}s`, item: `https://www.localspecialtycoffee.com/categories/${cat.slug}` },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
       <section className="py-14">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex items-center gap-5 mb-6">

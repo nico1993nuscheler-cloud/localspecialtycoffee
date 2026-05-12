@@ -7,7 +7,7 @@ const CAT_CDN = "https://cdn.prod.website-files.com/67d40638d300a0e9ce06264e";
 
 export const BRAND = {
   logo: `${CDN}/67d563468b5918265ae11dff_brandmark-design_2%20(1).png`,
-  newsletterIcon: `${CDN}/67e282473803f79eac315745_48x48_Newsletter_Icon%20(3).svg`,
+  newsletterIcon: `${CDN}/67e282473803f79eac315745_48x48_Newsletter_Icon%20(3)%20(1).svg`,
   brewtifulMapVisual: `${CDN}/67ec41bcc721c1659c005b6c_Specialty_Coffee_Map_Visual%20(2).png`,
   searchLoupe: `${CDN}/680b4ec792d3117c37ea8922_Vector.svg`,
   highlightArrow: `${CDN}/6810cc8f1863e651519da90a_16x16px%20Highlight%20Specialty%20Coffee-Arrow%20(1).svg`,

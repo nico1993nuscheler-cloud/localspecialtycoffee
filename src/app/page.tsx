@@ -1,10 +1,17 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getAllCities, getAllCategories, getAllPlaces, getPlacesInCity } from "@/lib/data";
+import {
+  getAllCategories,
+  getAllCities,
+  getAllPlaces,
+  getPlacesInCity,
+  getPlaceBySlug,
+} from "@/lib/data";
+import type { PlaceWithRefs } from "@/lib/types";
 import { HeroCollage } from "@/components/HeroCollage";
 import { CitySearch } from "@/components/CitySearch";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
-import { PlaceCard } from "@/components/PlaceCard";
+import { TrendingShuffle } from "@/components/TrendingShuffle";
 
 export default function HomePage() {
   const cities = getAllCities();
@@ -16,23 +23,27 @@ export default function HomePage() {
     .sort((a, b) => b._count - a._count)
     .slice(0, 6);
 
-  // Spotlight section — prefer is_featured flags if any are set; otherwise
-  // surface 6 fresh places from the biggest cities so the section never empties.
-  const allPlaces = getAllPlaces();
-  const flagged = allPlaces.filter((p) => p.is_featured);
-  const spotlightSource =
-    flagged.length >= 3
-      ? flagged
-      : featuredCities.flatMap((c) =>
-          allPlaces.filter((p) => p.city_webflow_id === c.webflow_id).slice(0, 1),
-        );
-  const featuredPlaces = spotlightSource.slice(0, 6);
-  const spotlightHeading = flagged.length >= 3 ? "Featured spots" : "Trending right now";
+  // Pool for the "Trending right now" shuffle — pick 2 places per top-15 city
+  // (gives ~30 candidates of solid variety; client-side shuffle picks 6).
+  const pool: PlaceWithRefs[] = featuredCities
+    .concat(
+      [...cities]
+        .map((c) => ({ ...c, _count: getPlacesInCity(c.webflow_id).length }))
+        .sort((a, b) => b._count - a._count)
+        .slice(6, 15),
+    )
+    .flatMap((c) => {
+      const cityPlaces = getAllPlaces().filter((p) => p.city_webflow_id === c.webflow_id);
+      return cityPlaces
+        .slice(0, 2)
+        .map((p) => getPlaceBySlug(p.slug))
+        .filter((p): p is PlaceWithRefs => !!p);
+    });
 
   return (
     <>
       {/* Hero with collage */}
-      <section className="bg-bg pt-10 pb-20">
+      <section className="bg-bg pt-10 pb-20 motion-safe:animate-fade-up">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-[1fr_1.2fr] gap-12 items-center">
           <div>
             <h1 className="text-4xl md:text-6xl font-bold leading-[1.05] tracking-tight mb-5">
@@ -44,9 +55,10 @@ export default function HomePage() {
             </p>
             <Link
               href="#city-search"
-              className="inline-block rounded-full bg-coral text-white px-7 py-3.5 font-semibold hover:bg-coral-300 transition-colors"
+              className="inline-flex items-center gap-2 rounded-full bg-coral text-white px-7 py-3.5 font-semibold hover:bg-coral-300 hover:-translate-y-0.5 transition-all shadow-md hover:shadow-lg"
             >
               Find Specialty Coffee
+              <span aria-hidden>→</span>
             </Link>
           </div>
           <HeroCollage />
@@ -80,7 +92,7 @@ export default function HomePage() {
               <Link
                 key={city.webflow_id}
                 href={`/cities/${city.slug}`}
-                className="group rounded-2xl overflow-hidden bg-white border border-blush hover:border-coral transition-all"
+                className="group rounded-2xl overflow-hidden bg-white border border-blush hover:border-coral hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
               >
                 <div className="aspect-[1080/680] bg-blush relative">
                   {city.thumbnail_v2_url && (
@@ -89,7 +101,7 @@ export default function HomePage() {
                       alt={`Specialty coffee in ${city.name}`}
                       fill
                       sizes="(max-width: 768px) 50vw, 33vw"
-                      className="object-cover group-hover:scale-[1.03] transition-transform"
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   )}
                 </div>
@@ -106,21 +118,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured spots */}
-      {featuredPlaces.length > 0 && (
+      {/* Trending right now (client-shuffled) */}
+      {pool.length > 0 && (
         <section className="py-12 bg-blush/30">
           <div className="max-w-6xl mx-auto px-6">
-            <h2 className="text-3xl md:text-4xl font-bold mb-10 text-center">{spotlightHeading}</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {featuredPlaces.map((p) => {
-                const place = {
-                  ...p,
-                  city: cities.find((c) => c.webflow_id === p.city_webflow_id)!,
-                  category: categories.find((c) => c.webflow_id === p.category_webflow_id)!,
-                };
-                return <PlaceCard key={p.webflow_id} place={place} showCity />;
-              })}
+            <div className="text-center mb-10">
+              <h2 className="text-3xl md:text-4xl font-bold mb-2">Trending right now</h2>
+              <p className="text-sm text-muted">A fresh handful of spots each visit. Refresh for more.</p>
             </div>
+            <TrendingShuffle pool={pool} />
           </div>
         </section>
       )}
@@ -137,7 +143,7 @@ export default function HomePage() {
               <Link
                 key={cat.webflow_id}
                 href={`/categories/${cat.slug}`}
-                className="group bg-white rounded-3xl p-10 text-center border border-blush hover:border-coral transition-all"
+                className="group bg-white rounded-3xl p-10 text-center border border-blush hover:border-coral hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
               >
                 {cat.icon_large_url && (
                   <Image
@@ -145,7 +151,7 @@ export default function HomePage() {
                     alt={cat.name}
                     width={64}
                     height={60}
-                    className="mx-auto mb-5"
+                    className="mx-auto mb-5 group-hover:scale-110 transition-transform duration-300"
                     unoptimized
                   />
                 )}

@@ -9,7 +9,7 @@ const TAGLINE_BY_CITY: Record<string, string> = {
   "best-coffee-shops-in-london": "Explore London's unique coffee roasters",
   "specialty-coffee-berlin": "Explore Berlin's coffee scene",
   "best-coffee-in-amsterdam": "Discover Amsterdam's top spots",
-  "best-coffee-in-melbourne": "Coffee-mad Melbourne, mapped",
+  "good-coffee-melbourne": "Coffee-mad Melbourne, mapped",
   "best-coffee-shops-in-paris-france": "Paris cafés worth the detour",
 };
 
@@ -21,16 +21,39 @@ export function Footer() {
     .slice(0, 3);
 
   return (
-    <footer className="bg-ink text-white mt-24">
-      <div className="max-w-7xl mx-auto px-6 pt-16 pb-10">
+    <footer className="bg-ink text-white mt-20">
+      <div className="max-w-7xl mx-auto px-6 pt-12 pb-6">
 
-        {/* Top link grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-12">
+        {/* Newsletter strip — promoted to top of footer (highest conversion priority) */}
+        <div className="rounded-2xl bg-[#1a1a1a] border border-white/10 p-5 md:px-7 md:py-5 grid md:grid-cols-[1.1fr_1fr] gap-6 items-center mb-10">
+          <div className="flex items-center gap-4">
+            <Image
+              src={BRAND.newsletterIcon}
+              alt=""
+              width={42}
+              height={42}
+              unoptimized
+              className="shrink-0"
+            />
+            <div>
+              <h3 className="text-lg md:text-xl font-bold mb-0.5">Brew-tiful News! ☕</h3>
+              <p className="text-sm text-white/60 max-w-md">
+                The Google Maps list, city updates, bean stories & subscriber-only deals.
+              </p>
+            </div>
+          </div>
+          <div className="bg-white p-1 rounded-full">
+            <NewsletterForm tier="lead_magnet" cta="Subscribe" />
+          </div>
+        </div>
+
+        {/* 3-column links — tightened */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-8 mb-10">
           <div>
-            <h3 className="text-xs font-semibold mb-4 uppercase tracking-wider text-coral">
+            <h3 className="text-[11px] font-bold mb-3 uppercase tracking-wider text-coral">
               Discover Specialty Coffee
             </h3>
-            <ul className="space-y-2.5 text-sm">
+            <ul className="space-y-2 text-sm text-white/85">
               <li><Link href="/categories/specialty-coffee-shops" className="hover:text-coral transition-colors">Specialty Coffee Shops</Link></li>
               <li><Link href="/categories/coffee-roasters" className="hover:text-coral transition-colors">Coffee Roasters</Link></li>
               <li><Link href="/categories/barista-course" className="hover:text-coral transition-colors">Barista Courses</Link></li>
@@ -40,23 +63,23 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="text-xs font-semibold mb-4 uppercase tracking-wider text-coral">
+            <h3 className="text-[11px] font-bold mb-3 uppercase tracking-wider text-coral">
               New cities added
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2">
               {featuredFooterCities.map((c) => (
                 <li key={c.slug}>
                   <Link
                     href={`/cities/${c.slug}`}
                     className="group flex items-center gap-3"
                   >
-                    <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-white/5 flex-shrink-0">
+                    <div className="relative w-10 h-10 rounded-md overflow-hidden bg-white/5 flex-shrink-0">
                       {c.thumbnail_v3_url && (
                         <Image
                           src={c.thumbnail_v3_url}
                           alt={c.name}
                           fill
-                          sizes="48px"
+                          sizes="40px"
                           className="object-cover"
                         />
                       )}
@@ -65,7 +88,7 @@ export function Footer() {
                       <p className="font-semibold text-sm group-hover:text-coral transition-colors leading-tight">
                         {c.name}
                       </p>
-                      <p className="text-xs text-white/55 leading-tight mt-0.5 line-clamp-1">
+                      <p className="text-xs text-white/50 leading-tight mt-0.5 line-clamp-1">
                         {TAGLINE_BY_CITY[c.slug] ?? `${c._count} curated spots`}
                       </p>
                     </div>
@@ -76,55 +99,30 @@ export function Footer() {
           </div>
 
           <div>
-            <h3 className="text-xs font-semibold mb-4 uppercase tracking-wider text-coral">
+            <h3 className="text-[11px] font-bold mb-3 uppercase tracking-wider text-coral">
               Localspecialtycoffee.com
             </h3>
-            <ul className="space-y-2.5 text-sm">
+            <ul className="space-y-2 text-sm text-white/85">
               <li><Link href="/about" className="hover:text-coral transition-colors">About</Link></li>
               <li><Link href="/contact" className="hover:text-coral transition-colors">Contact</Link></li>
               <li><Link href="/faqs" className="hover:text-coral transition-colors">FAQs</Link></li>
               <li><Link href="/submissions" className="hover:text-coral transition-colors">Submissions</Link></li>
               <li><Link href="/terms-conditions" className="hover:text-coral transition-colors">Terms &amp; Conditions</Link></li>
-              <li><Link href="/terms-conditions" className="hover:text-coral transition-colors">Imprint</Link></li>
             </ul>
           </div>
         </div>
 
-        {/* Newsletter strip */}
-        <div className="rounded-3xl bg-[#1a1a1a] border border-white/10 p-6 md:p-8 grid md:grid-cols-[1.1fr_1fr] gap-8 items-center mb-10">
-          <div className="flex items-start gap-4">
-            <Image
-              src={BRAND.newsletterIcon}
-              alt=""
-              width={48}
-              height={48}
-              unoptimized
-              className="shrink-0"
-            />
-            <div>
-              <h3 className="text-xl md:text-2xl font-bold mb-1">Brew-tiful News! ☕</h3>
-              <p className="text-sm text-white/65 max-w-md">
-                Get access to the Google Maps list, receive city updates, bean
-                stories &amp; subscriber-only deals.
-              </p>
-            </div>
-          </div>
-          <div className="bg-white p-1 rounded-full">
-            <NewsletterForm tier="lead_magnet" cta="Subscribe" />
-          </div>
-        </div>
-
         {/* Brand + copyright row */}
-        <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <Link href="/" className="inline-flex">
-            <span className="bg-white rounded-lg p-2.5">
+        <div className="border-t border-white/10 pt-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <Link href="/" className="inline-flex" aria-label="Local Specialty Coffee — Home">
+            <span className="bg-white rounded-lg p-2">
               <Image
                 src={BRAND.logo}
                 alt="Local Specialty Coffee"
-                width={140}
-                height={50}
+                width={120}
+                height={42}
                 unoptimized
-                className="h-10 w-auto"
+                className="h-8 w-auto"
               />
             </span>
           </Link>

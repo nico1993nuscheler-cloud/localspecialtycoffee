@@ -4,6 +4,9 @@ import "./globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
+const DEFAULT_OG_IMAGE =
+  "https://cdn.prod.website-files.com/67d40637d300a0e9ce062510/67ec41bcc721c1659c005b6c_Specialty_Coffee_Map_Visual%20(2).png";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.localspecialtycoffee.com"),
   title: {
@@ -15,6 +18,11 @@ export const metadata: Metadata = {
   openGraph: {
     siteName: "Local Specialty Coffee",
     type: "website",
+    images: [{ url: DEFAULT_OG_IMAGE, width: 1200, height: 630, alt: "Local Specialty Coffee" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: [DEFAULT_OG_IMAGE],
   },
   alternates: {
     canonical: "/",
@@ -29,6 +37,32 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
+        {/* Sitewide structured data — Organization + WebSite + SearchAction */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify([
+              {
+                "@context": "https://schema.org",
+                "@type": "Organization",
+                name: "Local Specialty Coffee",
+                url: "https://www.localspecialtycoffee.com",
+                logo: "https://cdn.prod.website-files.com/67d40637d300a0e9ce062510/67d563468b5918265ae11dff_brandmark-design_2%20(1).png",
+              },
+              {
+                "@context": "https://schema.org",
+                "@type": "WebSite",
+                name: "Local Specialty Coffee",
+                url: "https://www.localspecialtycoffee.com",
+                potentialAction: {
+                  "@type": "SearchAction",
+                  target: "https://www.localspecialtycoffee.com/cities?q={search_term_string}",
+                  "query-input": "required name=search_term_string",
+                },
+              },
+            ]),
+          }}
+        />
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />

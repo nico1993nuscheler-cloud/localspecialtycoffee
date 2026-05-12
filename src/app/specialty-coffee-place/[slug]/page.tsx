@@ -100,6 +100,16 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
     telephone: p.phone,
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.localspecialtycoffee.com/" },
+      { "@type": "ListItem", position: 2, name: p.city.name, item: `https://www.localspecialtycoffee.com/cities/${p.city.slug}` },
+      { "@type": "ListItem", position: 3, name: p.name, item: `https://www.localspecialtycoffee.com/specialty-coffee-place/${p.slug}` },
+    ],
+  };
+
   // Keyless Google Maps embed — works without the API-key referrer restriction
   // that prevented the Webflow key from rendering on non-www domains.
   const mapsQuery = encodeURIComponent(`${p.name} ${p.address ?? ""} ${p.city.name}`);
@@ -110,6 +120,10 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
 
       {/* Breadcrumb */}
