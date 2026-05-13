@@ -11,4 +11,5 @@ out
 
 # Heavy raw Webflow snapshots (transformed JSON is what we use)
 data/snapshots/
+data/.tmp/
 .env*.local
