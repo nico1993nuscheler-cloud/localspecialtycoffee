@@ -72,6 +72,32 @@ export function getCityGeo(slug: string): GeoMeta {
   return META[slug] ?? FUTURE_CITIES[slug] ?? { continent: "Europe", country: "Unknown" };
 }
 
+const COUNTRY_FLAGS: Record<string, string> = {
+  "Netherlands": "🇳🇱",
+  "Spain": "🇪🇸",
+  "Belgium": "🇧🇪",
+  "Denmark": "🇩🇰",
+  "Portugal": "🇵🇹",
+  "Norway": "🇳🇴",
+  "Sweden": "🇸🇪",
+  "United Kingdom": "🇬🇧",
+  "France": "🇫🇷",
+  "Czechia": "🇨🇿",
+  "Germany": "🇩🇪",
+  "United States": "🇺🇸",
+  "Canada": "🇨🇦",
+  "Brazil": "🇧🇷",
+  "South Korea": "🇰🇷",
+  "Saudi Arabia": "🇸🇦",
+  "New Zealand": "🇳🇿",
+  "Australia": "🇦🇺",
+  "South Africa": "🇿🇦",
+};
+
+export function getCityFlag(slug: string): string {
+  return COUNTRY_FLAGS[getCityGeo(slug).country] ?? "";
+}
+
 export const ALL_CONTINENTS: Continent[] = [
   "Europe",
   "North America",

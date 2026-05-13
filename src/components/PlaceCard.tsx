@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BRAND } from "@/lib/brand";
+import { getCityFlag } from "@/lib/geography";
 import type { PlaceWithRefs } from "@/lib/types";
 
 export function PlaceCard({ place, showCity = false }: { place: PlaceWithRefs; showCity?: boolean }) {
@@ -40,8 +41,8 @@ export function PlaceCard({ place, showCity = false }: { place: PlaceWithRefs; s
       <div className="p-5 flex flex-col gap-2 flex-1">
         <h3 className="font-bold text-lg leading-snug">{place.name}</h3>
         {showCity && (
-          <p className="flex items-center gap-1 text-sm text-coral">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a8 8 0 00-8 8c0 5.4 7 12 7.3 12.3a1 1 0 001.4 0C13 22 20 15.4 20 10a8 8 0 00-8-8zm0 11a3 3 0 110-6 3 3 0 010 6z"/></svg>
+          <p className="flex items-center gap-1.5 text-sm text-coral">
+            <span aria-hidden className="text-base leading-none">{getCityFlag(place.city.slug)}</span>
             {place.city.name}
           </p>
         )}
