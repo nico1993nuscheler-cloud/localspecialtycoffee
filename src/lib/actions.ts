@@ -25,14 +25,102 @@ const NOTIFY_TO = process.env.NOTIFY_TO ?? "localspecialtycoffee@gmail.com";
 // after adding the DNS records in Resend.
 const NOTIFY_FROM = process.env.NOTIFY_FROM ?? "Local Specialty Coffee <onboarding@resend.dev>";
 
-const SUBJECTS: Record<Exclude<SubmissionTier, "lead_magnet" | "newsletter">, string> = {
-  contact: "New contact form submission",
-  submission_free: "New free submission",
-  submission_premium: "New premium submission",
+type OwnerTier = Exclude<SubmissionTier, "lead_magnet" | "newsletter">;
+
+const FIELD_LABELS: Record<string, string> = {
+  name: "Name",
+  full_name: "Name",
+  email: "Email",
+  phone: "Phone",
+  city: "City",
+  message: "Message",
+  spot_name: "Spot",
+  description: "Description",
+  website: "Website",
+  address: "Address",
+  booking_link: "Booking link",
+};
+
+function pickStr(payload: Record<string, unknown>, key: string): string {
+  const v = payload[key];
+  return typeof v === "string" ? v.trim() : "";
+}
+
+function categoriesFrom(payload: Record<string, unknown>): string {
+  const map: Record<string, string> = {
+    category_specialty_coffee_shop: "Specialty Coffee Shop",
+    category_coffee_roaster: "Coffee Roaster",
+    category_barista_course: "Barista Course",
+  };
+  return Object.entries(map)
+    .filter(([k]) => payload[k])
+    .map(([, label]) => label)
+    .join(", ");
+}
+
+function subjectFor(tier: OwnerTier, payload: Record<string, unknown>): string {
+  const name = pickStr(payload, "name") || pickStr(payload, "full_name") || "no name";
+  const city = pickStr(payload, "city");
+  const spot = pickStr(payload, "spot_name");
+  const where = city || pickStr(payload, "address");
+
+  if (tier === "contact") {
+    return city ? `${name} from ${city} got in touch` : `${name} got in touch`;
+  }
+  if (tier === "submission_free") {
+    const label = spot || name;
+    return where ? `Free listing request: ${label} (${where})` : `Free listing request: ${label}`;
+  }
+  // submission_premium
+  const label = spot || name;
+  return where ? `Premium listing request: ${label} (${where})` : `Premium listing request: ${label}`;
+}
+
+function bodyLines(tier: OwnerTier, payload: Record<string, unknown>): { label: string; value: string }[] {
+  const lines: { label: string; value: string }[] = [];
+  const used = new Set<string>();
+  const ordered = tier === "contact"
+    ? ["name", "email", "phone", "city", "message"]
+    : ["full_name", "email", "phone", "spot_name", "description", "website", "address", "booking_link"];
+
+  for (const key of ordered) {
+    const v = pickStr(payload, key);
+    if (v) {
+      lines.push({ label: FIELD_LABELS[key] ?? key, value: v });
+      used.add(key);
+    }
+  }
+  if (tier !== "contact") {
+    const cats = categoriesFrom(payload);
+    if (cats) lines.push({ label: "Category", value: cats });
+  }
+  // Catch any unmapped non-empty string fields so nothing is silently lost
+  for (const [k, v] of Object.entries(payload)) {
+    if (used.has(k) || k.startsWith("category_")) continue;
+    if (typeof v === "string" && v.trim()) {
+      lines.push({ label: FIELD_LABELS[k] ?? k, value: v.trim() });
+    }
+  }
+  return lines;
+}
+
+const OPENERS: Record<OwnerTier, (payload: Record<string, unknown>) => string> = {
+  contact: (p) => {
+    const name = pickStr(p, "name") || "Someone";
+    return `${name} sent you a message via the contact form on localspecialtycoffee.com. Hit reply to respond directly — their email is set as Reply-To.`;
+  },
+  submission_free: (p) => {
+    const spot = pickStr(p, "spot_name") || "a new spot";
+    return `Someone wants to submit ${spot} for a free listing on localspecialtycoffee.com. Hit reply to follow up.`;
+  },
+  submission_premium: (p) => {
+    const spot = pickStr(p, "spot_name") || "a new spot";
+    return `Someone wants premium placement for ${spot} on localspecialtycoffee.com. Hit reply to follow up.`;
+  },
 };
 
 async function notifyOwner(
-  tier: Exclude<SubmissionTier, "lead_magnet" | "newsletter">,
+  tier: OwnerTier,
   payload: Record<string, unknown>,
   replyTo?: string,
 ) {
@@ -40,18 +128,39 @@ async function notifyOwner(
     console.error("[resend] missing RESEND_API_KEY — submission not emailed", tier, payload);
     return;
   }
-  const rows = Object.entries(payload)
-    .filter(([, v]) => v !== "" && v != null)
-    .map(([k, v]) => `<tr><td style="padding:4px 12px 4px 0;color:#666;vertical-align:top;"><strong>${escapeHtml(k)}</strong></td><td style="padding:4px 0;">${escapeHtml(String(v)).replace(/\n/g, "<br>")}</td></tr>`)
+
+  const subject = subjectFor(tier, payload);
+  const opener = OPENERS[tier](payload);
+  const lines = bodyLines(tier, payload);
+
+  const textBody = [
+    opener,
+    "",
+    ...lines.map(({ label, value }) => `${label}: ${value}`),
+    "",
+    "— sent from localspecialtycoffee.com",
+  ].join("\n");
+
+  const htmlLines = lines
+    .map(({ label, value }) =>
+      `<p style="margin:0 0 10px 0;"><strong style="color:#222;">${escapeHtml(label)}:</strong> ${escapeHtml(value).replace(/\n/g, "<br>")}</p>`,
+    )
     .join("");
+  const htmlBody = `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.5;color:#222;max-width:520px;">
+<p style="margin:0 0 16px 0;">${escapeHtml(opener)}</p>
+${htmlLines}
+<p style="margin:24px 0 0 0;color:#888;font-size:13px;">— sent from localspecialtycoffee.com</p>
+</div>`;
+
   try {
     const resend = new Resend(RESEND_API_KEY);
     const { error } = await resend.emails.send({
       from: NOTIFY_FROM,
       to: [NOTIFY_TO],
       replyTo: replyTo || undefined,
-      subject: SUBJECTS[tier],
-      html: `<table style="font-family:system-ui,sans-serif;font-size:14px;border-collapse:collapse;">${rows}</table>`,
+      subject,
+      html: htmlBody,
+      text: textBody,
     });
     if (error) console.error("[resend] send error", tier, error);
   } catch (err) {
