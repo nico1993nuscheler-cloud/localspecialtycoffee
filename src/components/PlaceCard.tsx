@@ -18,6 +18,7 @@ export function PlaceCard({ place, showCity = false }: { place: PlaceWithRefs; s
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             className="object-cover group-hover:scale-[1.02] transition-transform"
+            unoptimized
           />
         ) : null}
 
