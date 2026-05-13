@@ -1,0 +1,17 @@
+[
+  { "slug": "jonas-reindl-vienna", "name": "Jonas Reindl Coffee Roasters", "address": "Westbahnstraße 13", "city": "Vienna", "country": "Austria" },
+  { "slug": "people-on-caffeine-vienna", "name": "POC People on Caffeine", "city": "Vienna", "country": "Austria" },
+  { "slug": "kaffemik-vienna", "name": "Kaffemik", "city": "Vienna", "country": "Austria" },
+  { "slug": "caffe-couture-vienna", "name": "Caffè Couture", "city": "Vienna", "country": "Austria" },
+  { "slug": "gota-coffee-experts-vienna", "name": "GOTA Coffee Experts", "address": "Mariahilfer Straße 192", "city": "Vienna", "country": "Austria" },
+  { "slug": "coffeepirates-vienna", "name": "CoffeePirates", "city": "Vienna", "country": "Austria" },
+  { "slug": "vogel-kaffee-vienna", "name": "Vogel Kaffee", "city": "Vienna", "country": "Austria" },
+  { "slug": "suessmund-kaffee-vienna", "name": "Süssmund Kaffee", "city": "Vienna", "country": "Austria" },
+  { "slug": "balthasar-vienna", "name": "Balthasar Kaffee Bar", "address": "Praterstraße 38", "city": "Vienna", "country": "Austria" },
+  { "slug": "kaffeefabrik-vienna", "name": "Kaffeefabrik", "city": "Vienna", "country": "Austria" },
+  { "slug": "baristas-united-vienna", "name": "Baristas United", "address": "Landstraßer Hauptstraße 34", "city": "Vienna", "country": "Austria" },
+  { "slug": "coffee-comet-vienna", "name": "Coffee Comet", "city": "Vienna", "country": "Austria" },
+  { "slug": "wolfgang-coffee-vienna", "name": "Wolfgang Coffee", "city": "Vienna", "country": "Austria" },
+  { "slug": "good-coffee-society-1020-vienna", "name": "The Good Coffee Society 1020", "address": "Ilgplatz 6", "city": "Vienna", "country": "Austria" },
+  { "slug": "coffeewerk-vienna", "name": "COFFEEWERK", "address": "Mariahilfer Straße 149", "city": "Vienna", "country": "Austria" }
+]
