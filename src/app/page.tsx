@@ -16,14 +16,18 @@ import { FeaturedCitiesGrid } from "@/components/FeaturedCitiesGrid";
 
 export const revalidate = 600;
 
+const CATEGORY_TAGLINES: Record<string, string> = {
+  "specialty-coffee-shops": "Hand-picked cafés near you",
+  "coffee-roasters": "Roasters worth seeking out",
+  "barista-course": "Courses with top baristas",
+};
+
 export default async function HomePage() {
   const [cities, categories, allPlaces] = await Promise.all([
     getAllCities(),
     getAllCategories(),
     getAllPlaces(),
   ]);
-  const totalPlaces = allPlaces.length;
-
   const citiesWithCountsArr = await Promise.all(
     cities.map(async (c) => ({
       ...c,
@@ -52,17 +56,16 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-[1fr_1.2fr] gap-12 items-center">
           <div>
             <h1 className="text-4xl md:text-6xl font-bold leading-[1.05] tracking-tight mb-5">
-              Find Specialty Coffee near you
+              Find the best Specialty Coffee near you
             </h1>
             <p className="text-lg text-muted mb-7 max-w-md">
-              Discover unique Specialty Coffee Shops, awarded Coffee Roasters,
-              exclusive Beans, Micro Lots and Barista Courses in your area.
+              Hand-picked cafés, roasters, and barista courses — wherever you are.
             </p>
             <Link
               href="#city-search"
               className="inline-flex items-center gap-2 rounded-full bg-coral-bright text-ink px-7 py-3.5 font-bold hover:bg-coral hover:text-white hover:-translate-y-0.5 transition-all shadow-md hover:shadow-lg"
             >
-              Find Specialty Coffee
+              Find the best Coffee
               <span aria-hidden>→</span>
             </Link>
           </div>
@@ -74,9 +77,9 @@ export default async function HomePage() {
       <section className="bg-bg py-16 border-y border-blush">
         <div className="max-w-6xl mx-auto px-6 text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold mb-2">
-            Search Coffee Roasters & Shops in your City
+            The best Specialty Coffee in your city
           </h2>
-          <p className="text-muted">and discover the best Specialty Coffee in your area</p>
+          <p className="text-muted">Pick a city and start exploring.</p>
         </div>
         <div className="px-6">
           <CitySearch cities={cities.map((c) => ({ slug: c.slug, name: c.name }))} />
@@ -101,8 +104,8 @@ export default async function HomePage() {
         <section className="py-12 bg-blush/30">
           <div className="max-w-6xl mx-auto px-6">
             <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold mb-2">Trending right now</h2>
-              <p className="text-sm text-muted">A fresh handful of spots each visit. Filter by type or reshuffle for more.</p>
+              <h2 className="text-3xl md:text-4xl font-bold mb-2">The best, right now</h2>
+              <p className="text-sm text-muted">A fresh handful of top spots each visit. Filter by type or reshuffle.</p>
             </div>
             <TrendingShuffle pool={pool} categories={categories} />
           </div>
@@ -113,30 +116,36 @@ export default async function HomePage() {
       <section className="py-20">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-bold mb-3 text-center">Browse by type</h2>
-          <p className="text-center text-muted mb-12">
-            {totalPlaces}+ curated spots across {cities.length} cities — pick your flavour.
+          <p className="text-center text-muted mb-10 md:mb-12">
+            Find the best specialty coffee near you.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {categories.map((cat) => (
-              <Link
-                key={cat.webflow_id}
-                href={`/categories/${cat.slug}`}
-                className="group bg-white rounded-3xl p-10 text-center border border-blush hover:border-coral hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
-              >
-                {cat.icon_large_url && (
-                  <Image
-                    src={cat.icon_large_url}
-                    alt={cat.name}
-                    width={64}
-                    height={60}
-                    className="mx-auto mb-5 group-hover:scale-110 transition-transform duration-300"
-                    unoptimized
-                  />
-                )}
-                <h3 className="text-2xl font-bold mb-2">{cat.name}</h3>
-                <p className="text-sm text-muted">{cat.description}</p>
-              </Link>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+            {categories.map((cat) => {
+              const tagline = CATEGORY_TAGLINES[cat.slug] ?? cat.description;
+              return (
+                <Link
+                  key={cat.webflow_id}
+                  href={`/categories/${cat.slug}`}
+                  className="group flex flex-col items-center text-center bg-white rounded-3xl p-6 md:p-10 border border-blush hover:border-coral hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                >
+                  {cat.icon_large_url && (
+                    <Image
+                      src={cat.icon_large_url}
+                      alt={cat.name}
+                      width={64}
+                      height={60}
+                      className="mb-4 md:mb-5"
+                      unoptimized
+                    />
+                  )}
+                  <h3 className="text-xl md:text-2xl font-bold mb-2">{cat.name}</h3>
+                  <p className="text-coral text-sm md:text-base font-medium">{tagline}</p>
+                  <span className="mt-5 inline-flex items-center gap-1 text-sm text-muted group-hover:text-coral transition-colors">
+                    Browse <span aria-hidden>→</span>
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
