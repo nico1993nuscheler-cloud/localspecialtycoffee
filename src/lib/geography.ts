@@ -29,8 +29,10 @@ const META: Record<string, GeoMeta> = {
   "coffee-shops-glasgow": { continent: "Europe", country: "United Kingdom" },
   "coffee-shops-leeds": { continent: "Europe", country: "United Kingdom" },
   "specialty-coffee-berlin": { continent: "Europe", country: "Germany" },
+  "specialty-coffee-helsinki": { continent: "Europe", country: "Finland" },
   "specialty-coffee-porto": { continent: "Europe", country: "Portugal" },
   "specialty-coffee-shop-munich": { continent: "Europe", country: "Germany" },
+  "specialty-coffee-vienna": { continent: "Europe", country: "Austria" },
 
   // North America
   "best-coffee-in-austin": { continent: "North America", country: "United States" },
@@ -39,9 +41,11 @@ const META: Record<string, GeoMeta> = {
   "best-coffee-shops-in-new-york": { continent: "North America", country: "United States" },
   "best-coffee-shops-in-toronto": { continent: "North America", country: "Canada" },
   "best-coffee-shops-san-diego": { continent: "North America", country: "United States" },
+  "best-specialty-coffee-los-angeles": { continent: "North America", country: "United States" },
   "coffee-shops-ottawa": { continent: "North America", country: "Canada" },
   "good-coffee-shops-in-vancouver": { continent: "North America", country: "Canada" },
   "portland-coffee-roasters": { continent: "North America", country: "United States" },
+  "specialty-coffee-mexico-city-mexico": { continent: "North America", country: "Mexico" },
 
   // South America
   "best-coffee-sao-paulo": { continent: "South America", country: "Brazil" },
@@ -50,6 +54,7 @@ const META: Record<string, GeoMeta> = {
   // Asia
   "best-coffee-seoul": { continent: "Asia", country: "South Korea" },
   "coffee-shops-in-riyadh-9db9a": { continent: "Asia", country: "Saudi Arabia" },
+  "specialty-coffee-tokyo-japan": { continent: "Asia", country: "Japan" },
 
   // Oceania
   "best-cafes-in-christchurch": { continent: "Oceania", country: "New Zealand" },
@@ -82,11 +87,15 @@ const COUNTRY_FLAGS: Record<string, string> = {
   "Sweden": "🇸🇪",
   "United Kingdom": "🇬🇧",
   "France": "🇫🇷",
+  "Austria": "🇦🇹",
   "Czechia": "🇨🇿",
+  "Finland": "🇫🇮",
   "Germany": "🇩🇪",
   "United States": "🇺🇸",
   "Canada": "🇨🇦",
+  "Mexico": "🇲🇽",
   "Brazil": "🇧🇷",
+  "Japan": "🇯🇵",
   "South Korea": "🇰🇷",
   "Saudi Arabia": "🇸🇦",
   "New Zealand": "🇳🇿",
