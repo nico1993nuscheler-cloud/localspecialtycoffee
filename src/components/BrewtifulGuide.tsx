@@ -33,7 +33,7 @@ export function BrewtifulGuide({ compact = false }: { compact?: boolean }) {
               <p className="text-white/70 mb-5 text-sm">
                 Every spot in our directory, plotted on a single Google Map. Free.
               </p>
-              <div className="bg-white p-1 rounded-full max-w-md">
+              <div className="bg-white p-1 rounded-2xl sm:rounded-full max-w-md">
                 <NewsletterForm tier="lead_magnet" cta="Get Access to the Maps" />
               </div>
             </div>
@@ -45,17 +45,17 @@ export function BrewtifulGuide({ compact = false }: { compact?: boolean }) {
 
   return (
     <section className="max-w-6xl mx-auto px-6 py-8">
-      <div className="relative bg-[#0e1f3a] text-white rounded-3xl">
+      <div className="relative bg-[#0e1f3a] text-white rounded-3xl overflow-hidden md:overflow-visible">
         {/* Decorative shapes */}
         <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none opacity-25">
           <div className="absolute -left-32 top-1/4 w-80 h-80 bg-[#1a2f55] rotate-12 rounded-3xl" />
           <div className="absolute -right-20 -bottom-20 w-96 h-96 bg-[#1a2f55] -rotate-6 rounded-3xl" />
         </div>
 
-        <div className="relative grid md:grid-cols-[1.1fr_1fr] gap-6 md:gap-10 items-center min-h-[420px] md:min-h-[480px] py-10 md:py-14 pl-8 md:pl-14 pr-8">
+        <div className="relative grid md:grid-cols-[1.1fr_1fr] gap-6 md:gap-10 items-center min-h-[420px] md:min-h-[480px] py-10 md:py-14 px-6 md:pl-14 md:pr-8">
           {/* Text + form (left on desktop) */}
           <div className="order-2 md:order-1 max-w-xl">
-            <h2 className="text-3xl md:text-5xl font-bold leading-[1.1] mb-5">
+            <h2 className="text-[26px] sm:text-3xl md:text-5xl font-bold leading-[1.15] md:leading-[1.1] mb-5">
               A Brew-tiful Google Maps Specialty Coffee Guide! ☕
             </h2>
             <p className="text-white/80 text-base md:text-lg mb-6">
@@ -64,7 +64,7 @@ export function BrewtifulGuide({ compact = false }: { compact?: boolean }) {
               so you can explore every city&apos;s unique coffee scene — directly
               in Google Maps.
             </p>
-            <div className="bg-white p-1 rounded-full max-w-md shadow-lg">
+            <div className="bg-white p-1 rounded-2xl sm:rounded-full max-w-md shadow-lg">
               <NewsletterForm tier="lead_magnet" cta="Get access to the Maps" />
             </div>
             <p className="mt-4 text-xs text-white/50">
@@ -72,14 +72,14 @@ export function BrewtifulGuide({ compact = false }: { compact?: boolean }) {
             </p>
           </div>
 
-          {/* Phone mockup — breaks out of the dark card */}
-          <div className="order-1 md:order-2 relative md:absolute md:right-0 md:top-1/2 md:-translate-y-1/2 md:translate-x-6 lg:translate-x-12 md:w-[55%] lg:w-[52%]">
-            <div className="relative aspect-[3/4] md:aspect-[4/5] rotate-[6deg] drop-shadow-2xl">
+          {/* Phone mockup — contained on mobile, breaks out of the dark card on desktop */}
+          <div className="order-1 md:order-2 relative md:absolute md:right-0 md:top-1/2 md:-translate-y-1/2 md:translate-x-6 lg:translate-x-12 md:w-[55%] lg:w-[52%] max-w-[260px] mx-auto md:max-w-none md:mx-0">
+            <div className="relative aspect-[3/4] md:aspect-[4/5] rotate-[3deg] md:rotate-[6deg] drop-shadow-2xl">
               <Image
                 src={BRAND.brewtifulMapVisual}
                 alt="Brew-tiful Google Maps Specialty Coffee Guide on a phone"
                 fill
-                sizes="(max-width: 768px) 80vw, 500px"
+                sizes="(max-width: 768px) 60vw, 500px"
                 className="object-contain"
                 priority={false}
               />

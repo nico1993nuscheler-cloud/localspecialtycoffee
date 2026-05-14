@@ -74,7 +74,7 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
 
       {/* Hero */}
       <section className="relative">
-        <div className="relative aspect-[2880/1100] md:aspect-[2880/900] bg-blush">
+        <div className="relative aspect-[4/5] sm:aspect-[2880/1400] md:aspect-[2880/900] bg-blush">
           {city.featured_image_url && (
             <Image
               src={city.featured_image_url}
@@ -85,14 +85,14 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
               className="object-cover"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/25 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/15 md:from-black/65 md:via-black/25 md:to-transparent" />
           <div className="absolute inset-0 flex items-end">
-            <div className="max-w-6xl mx-auto px-6 pb-10 md:pb-14 text-white">
-              <h1 className="text-3xl md:text-6xl font-bold drop-shadow-lg leading-tight">
+            <div className="w-full max-w-6xl mx-auto px-6 pb-8 md:pb-14 text-white">
+              <h1 className="text-[26px] leading-[1.15] md:text-6xl md:leading-tight font-bold drop-shadow-lg">
                 {city.h1 ?? city.name}
               </h1>
               {city.summary && (
-                <p className="mt-3 text-lg md:text-xl max-w-2xl drop-shadow">{city.summary}</p>
+                <p className="mt-3 text-base md:text-xl max-w-2xl drop-shadow leading-snug">{city.summary}</p>
               )}
             </div>
           </div>

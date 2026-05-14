@@ -48,7 +48,7 @@ export async function Footer() {
               </p>
             </div>
           </div>
-          <div className="bg-white p-1 rounded-full">
+          <div className="bg-white p-1 rounded-2xl sm:rounded-full">
             <NewsletterForm tier="lead_magnet" cta="Subscribe" />
           </div>
         </div>
