@@ -74,7 +74,7 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
 
       {/* Hero */}
       <section className="relative">
-        <div className="relative aspect-[4/5] sm:aspect-[2880/1400] md:aspect-[2880/900] bg-blush">
+        <div className="relative aspect-square sm:aspect-[2880/1400] md:aspect-[2880/900] bg-blush">
           {city.featured_image_url && (
             <Image
               src={city.featured_image_url}
