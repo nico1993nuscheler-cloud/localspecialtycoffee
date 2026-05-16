@@ -112,6 +112,9 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Brewtiful Guide */}
+      <BrewtifulGuide />
+
       {/* Categories */}
       <section className="py-20">
         <div className="max-w-6xl mx-auto px-6">
@@ -149,9 +152,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Brewtiful Guide */}
-      <BrewtifulGuide />
     </>
   );
 }
