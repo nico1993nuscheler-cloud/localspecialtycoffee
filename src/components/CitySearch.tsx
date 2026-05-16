@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { BRAND } from "@/lib/brand";
 import type { City } from "@/lib/types";
-import { ALL_CONTINENTS, getCityFlag, getCityGeo, type Continent } from "@/lib/geography";
+import { getCityFlag, getCityGeo, type Continent } from "@/lib/geography";
 
 type Item = {
   slug: string;
@@ -48,10 +48,18 @@ export function CitySearch({ cities }: { cities: Pick<City, "slug" | "name">[] }
         if (!byContinent.has(it.continent)) byContinent.set(it.continent, []);
         byContinent.get(it.continent)!.push(it);
       }
-      const groups = ALL_CONTINENTS.filter((c) => byContinent.has(c)).map((c) => ({
-        continent: c,
-        items: byContinent.get(c)!.slice().sort((a, b) => a.name.localeCompare(b.name)),
-      }));
+      const groups = [...byContinent.keys()]
+        .sort((a, b) => a.localeCompare(b))
+        .map((c) => ({
+          continent: c,
+          items: byContinent
+            .get(c)!
+            .slice()
+            .sort(
+              (a, b) =>
+                a.country.localeCompare(b.country) || a.name.localeCompare(b.name),
+            ),
+        }));
       const flatList = groups.flatMap((g) => g.items);
       return { grouped: groups, flat: flatList };
     }

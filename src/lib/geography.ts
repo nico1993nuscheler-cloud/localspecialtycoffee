@@ -33,6 +33,7 @@ const META: Record<string, GeoMeta> = {
   "specialty-coffee-porto": { continent: "Europe", country: "Portugal" },
   "specialty-coffee-shop-munich": { continent: "Europe", country: "Germany" },
   "specialty-coffee-vienna": { continent: "Europe", country: "Austria" },
+  "specialty-coffee-zurich": { continent: "Europe", country: "Switzerland" },
 
   // North America
   "best-coffee-in-austin": { continent: "North America", country: "United States" },
@@ -54,6 +55,7 @@ const META: Record<string, GeoMeta> = {
   // Asia
   "best-coffee-seoul": { continent: "Asia", country: "South Korea" },
   "coffee-shops-in-riyadh-9db9a": { continent: "Asia", country: "Saudi Arabia" },
+  "specialty-coffee-singapore": { continent: "Asia", country: "Singapore" },
   "specialty-coffee-tokyo-japan": { continent: "Asia", country: "Japan" },
 
   // Oceania
@@ -89,6 +91,8 @@ const COUNTRY_FLAGS: Record<string, string> = {
   "France": "🇫🇷",
   "Austria": "🇦🇹",
   "Czechia": "🇨🇿",
+  "Switzerland": "🇨🇭",
+  "Singapore": "🇸🇬",
   "Finland": "🇫🇮",
   "Germany": "🇩🇪",
   "United States": "🇺🇸",
