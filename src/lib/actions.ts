@@ -1,6 +1,17 @@
 "use server";
 
 import { Resend } from "resend";
+import { verifyTurnstile } from "./turnstile";
+
+const CAPTCHA_ERROR: FormState = {
+  status: "error",
+  message: "Captcha check failed — please try again.",
+};
+
+function captchaToken(formData: FormData): string | null {
+  const v = formData.get("cf-turnstile-response");
+  return typeof v === "string" ? v : null;
+}
 
 // Server Actions for all 5 forms.
 // - Newsletter + lead-magnet signups: added directly to MailerLite. MailerLite's
@@ -216,6 +227,8 @@ async function forwardToMake(tier: SubmissionTier, payload: Record<string, unkno
 }
 
 export async function submitContact(_prev: FormState, formData: FormData): Promise<FormState> {
+  const captcha = await verifyTurnstile(captchaToken(formData));
+  if (!captcha.ok) return CAPTCHA_ERROR;
   const payload = {
     name: String(formData.get("name") || ""),
     email: String(formData.get("email") || ""),
@@ -235,6 +248,8 @@ export async function submitContact(_prev: FormState, formData: FormData): Promi
 }
 
 export async function submitFree(_prev: FormState, formData: FormData): Promise<FormState> {
+  const captcha = await verifyTurnstile(captchaToken(formData));
+  if (!captcha.ok) return CAPTCHA_ERROR;
   const payload = Object.fromEntries(formData.entries());
   console.log("[submission_free]", payload);
   const replyTo = typeof payload.email === "string" ? payload.email : undefined;
@@ -246,6 +261,8 @@ export async function submitFree(_prev: FormState, formData: FormData): Promise<
 }
 
 export async function submitPremium(_prev: FormState, formData: FormData): Promise<FormState> {
+  const captcha = await verifyTurnstile(captchaToken(formData));
+  if (!captcha.ok) return CAPTCHA_ERROR;
   const payload = Object.fromEntries(formData.entries());
   console.log("[submission_premium]", payload);
   const replyTo = typeof payload.email === "string" ? payload.email : undefined;
@@ -257,6 +274,8 @@ export async function submitPremium(_prev: FormState, formData: FormData): Promi
 }
 
 export async function subscribeLeadMagnet(_prev: FormState, formData: FormData): Promise<FormState> {
+  const captcha = await verifyTurnstile(captchaToken(formData));
+  if (!captcha.ok) return CAPTCHA_ERROR;
   const email = String(formData.get("email") || "");
   if (!email || !email.includes("@")) {
     return { status: "error", message: "Please enter a valid email." };
@@ -267,6 +286,8 @@ export async function subscribeLeadMagnet(_prev: FormState, formData: FormData):
 }
 
 export async function subscribeNewsletter(_prev: FormState, formData: FormData): Promise<FormState> {
+  const captcha = await verifyTurnstile(captchaToken(formData));
+  if (!captcha.ok) return CAPTCHA_ERROR;
   const email = String(formData.get("email") || "");
   if (!email || !email.includes("@")) {
     return { status: "error", message: "Please enter a valid email." };

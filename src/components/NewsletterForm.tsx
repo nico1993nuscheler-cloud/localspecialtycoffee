@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { subscribeLeadMagnet, subscribeNewsletter, type FormState } from "@/lib/actions";
+import { Turnstile } from "./Turnstile";
 
 const initial: FormState = { status: "idle" };
 
@@ -21,23 +22,26 @@ export function NewsletterForm({
   }
 
   return (
-    <form action={formAction} className="flex flex-col sm:flex-row gap-2 sm:gap-1 w-full">
-      <input
-        name="email"
-        type="email"
-        required
-        placeholder="Enter your email"
-        className="flex-1 min-w-0 rounded-full px-5 py-3 text-base text-ink bg-white placeholder:text-muted outline-none"
-      />
-      <button
-        type="submit"
-        disabled={pending}
-        className="rounded-full bg-coral-bright text-ink font-bold px-6 py-3 hover:bg-coral hover:text-white transition-colors disabled:opacity-50 whitespace-nowrap"
-      >
-        {pending ? "..." : buttonLabel}
-      </button>
+    <form action={formAction} className="flex flex-col gap-2 w-full">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-1 w-full">
+        <input
+          name="email"
+          type="email"
+          required
+          placeholder="Enter your email"
+          className="flex-1 min-w-0 rounded-full px-5 py-3 text-base text-ink bg-white placeholder:text-muted outline-none"
+        />
+        <button
+          type="submit"
+          disabled={pending}
+          className="rounded-full bg-coral-bright text-ink font-bold px-6 py-3 hover:bg-coral hover:text-white transition-colors disabled:opacity-50 whitespace-nowrap"
+        >
+          {pending ? "..." : buttonLabel}
+        </button>
+      </div>
+      <Turnstile size="compact" />
       {state.status === "error" && (
-        <p className="text-xs text-coral basis-full mt-1 sm:px-4">{state.message}</p>
+        <p className="text-xs text-coral mt-1 sm:px-4">{state.message}</p>
       )}
     </form>
   );

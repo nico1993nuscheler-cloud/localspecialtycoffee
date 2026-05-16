@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { submitContact, type FormState } from "@/lib/actions";
+import { Turnstile } from "./Turnstile";
 
 const initial: FormState = { status: "idle" };
 
@@ -40,6 +41,7 @@ export function ContactForm() {
         <span className="text-sm font-medium">Message</span>
         <textarea name="message" required rows={5} placeholder="Leave us a message" className="mt-1 block w-full rounded-lg border border-blush bg-white px-3 py-2" />
       </label>
+      <Turnstile />
       {state.status === "error" && <p className="text-sm text-coral">{state.message}</p>}
       <button type="submit" disabled={pending} className="rounded-full bg-coral-bright text-ink px-6 py-3 font-bold hover:bg-coral hover:text-white transition-colors disabled:opacity-50 w-fit">
         {pending ? "Sending..." : "Send message"}

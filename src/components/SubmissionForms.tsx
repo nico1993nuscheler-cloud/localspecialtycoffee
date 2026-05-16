@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { submitFree, submitPremium, type FormState } from "@/lib/actions";
+import { Turnstile } from "./Turnstile";
 
 const initial: FormState = { status: "idle" };
 
@@ -69,6 +70,7 @@ export function SubmissionFormFree() {
     <form action={formAction} className="grid gap-4 bg-white rounded-2xl border border-blush p-6">
       <h3 className="text-xl font-semibold">Free listing</h3>
       <CommonFields />
+      <Turnstile />
       {state.status === "error" && <p className="text-sm text-coral">{state.message}</p>}
       <button type="submit" disabled={pending} className="rounded-full bg-coral-bright text-ink px-6 py-3 font-bold hover:bg-coral hover:text-white disabled:opacity-50 w-fit">
         {pending ? "Submitting..." : "Submit free listing"}
@@ -95,6 +97,7 @@ export function SubmissionFormPremium() {
         <span className="text-sm font-medium">Booking link</span>
         <input name="booking_link" type="url" className="mt-1 block w-full rounded-lg border border-blush bg-white px-3 py-2" />
       </label>
+      <Turnstile />
       {state.status === "error" && <p className="text-sm text-coral">{state.message}</p>}
       <button type="submit" disabled={pending} className="rounded-full bg-ink text-white px-6 py-3 font-medium hover:bg-coral disabled:opacity-50 w-fit">
         {pending ? "Submitting..." : "Submit premium listing"}
