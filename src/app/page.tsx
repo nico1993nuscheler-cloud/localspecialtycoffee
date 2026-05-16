@@ -86,19 +86,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured cities — with continent filter chips */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-6">
-            <h2 className="text-3xl md:text-4xl font-bold">Featured cities</h2>
-            <Link href="/cities" className="text-sm font-medium text-coral hover:underline">
-              See all {cities.length} cities →
-            </Link>
-          </div>
-          <FeaturedCitiesGrid cities={citiesWithCounts} />
-        </div>
-      </section>
-
       {/* Trending right now — with category chips + reshuffle */}
       {pool.length > 0 && (
         <section className="py-12 bg-blush/30">
@@ -111,6 +98,19 @@ export default async function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Featured cities — with continent filter chips */}
+      <section className="py-20">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-3 mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold">Featured cities</h2>
+            <Link href="/cities" className="text-sm font-medium text-coral hover:underline">
+              See all {cities.length} cities →
+            </Link>
+          </div>
+          <FeaturedCitiesGrid cities={citiesWithCounts} />
+        </div>
+      </section>
 
       {/* Categories */}
       <section className="py-20">
