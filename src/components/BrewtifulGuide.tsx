@@ -74,7 +74,7 @@ export function BrewtifulGuide({ compact = false }: { compact?: boolean }) {
 
           {/* Phone mockup — contained on mobile, breaks out of the dark card on desktop */}
           <div className="order-1 md:order-2 relative md:absolute md:right-0 md:top-1/2 md:-translate-y-1/2 md:translate-x-6 lg:translate-x-12 md:w-[55%] lg:w-[52%] max-w-[260px] mx-auto md:max-w-none md:mx-0">
-            <div className="relative aspect-[3/4] md:aspect-[4/5] rotate-[3deg] md:rotate-[6deg] drop-shadow-2xl">
+            <div className="relative aspect-[3/4] md:aspect-[4/5] drop-shadow-2xl">
               <Image
                 src={BRAND.brewtifulMapVisual}
                 alt="Brew-tiful Google Maps Specialty Coffee Guide on a phone"
