@@ -39,7 +39,7 @@ export function NewsletterForm({
           {pending ? "..." : buttonLabel}
         </button>
       </div>
-      <Turnstile size="compact" />
+      <Turnstile />
       {state.status === "error" && (
         <p className="text-xs text-coral">{state.message}</p>
       )}
