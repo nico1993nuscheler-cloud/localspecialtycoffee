@@ -33,7 +33,7 @@ export function BrewtifulGuide({ compact = false }: { compact?: boolean }) {
               <p className="text-white/70 mb-5 text-sm">
                 Every spot in our directory, plotted on a single Google Map. Free.
               </p>
-              <div className="bg-white p-1 rounded-2xl sm:rounded-full max-w-md">
+              <div className="max-w-md">
                 <NewsletterForm tier="lead_magnet" cta="Get Access to the Maps" />
               </div>
             </div>
@@ -64,7 +64,7 @@ export function BrewtifulGuide({ compact = false }: { compact?: boolean }) {
               so you can explore every city&apos;s unique coffee scene — directly
               in Google Maps.
             </p>
-            <div className="bg-white p-1 rounded-2xl sm:rounded-full max-w-md shadow-lg">
+            <div className="max-w-md">
               <NewsletterForm tier="lead_magnet" cta="Get access to the Maps" />
             </div>
             <p className="mt-4 text-xs text-white/50">

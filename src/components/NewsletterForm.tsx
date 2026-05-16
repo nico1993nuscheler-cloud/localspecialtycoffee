@@ -22,8 +22,8 @@ export function NewsletterForm({
   }
 
   return (
-    <form action={formAction} className="flex flex-col gap-2 w-full">
-      <div className="flex flex-col sm:flex-row gap-2 sm:gap-1 w-full">
+    <form action={formAction} className="flex flex-col gap-3 w-full">
+      <div className="bg-white p-1 rounded-2xl sm:rounded-full w-full flex flex-col sm:flex-row gap-2 sm:gap-1">
         <input
           name="email"
           type="email"
@@ -41,7 +41,7 @@ export function NewsletterForm({
       </div>
       <Turnstile size="compact" />
       {state.status === "error" && (
-        <p className="text-xs text-coral mt-1 sm:px-4">{state.message}</p>
+        <p className="text-xs text-coral">{state.message}</p>
       )}
     </form>
   );
