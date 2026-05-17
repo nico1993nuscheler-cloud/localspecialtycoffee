@@ -55,6 +55,7 @@ const META: Record<string, GeoMeta> = {
   // Asia
   "best-coffee-seoul": { continent: "Asia", country: "South Korea" },
   "coffee-shops-in-riyadh-9db9a": { continent: "Asia", country: "Saudi Arabia" },
+  "specialty-coffee-bangkok": { continent: "Asia", country: "Thailand" },
   "specialty-coffee-singapore": { continent: "Asia", country: "Singapore" },
   "specialty-coffee-tokyo-japan": { continent: "Asia", country: "Japan" },
 
@@ -93,6 +94,7 @@ const COUNTRY_FLAGS: Record<string, string> = {
   "Czechia": "🇨🇿",
   "Switzerland": "🇨🇭",
   "Singapore": "🇸🇬",
+  "Thailand": "🇹🇭",
   "Finland": "🇫🇮",
   "Germany": "🇩🇪",
   "United States": "🇺🇸",
