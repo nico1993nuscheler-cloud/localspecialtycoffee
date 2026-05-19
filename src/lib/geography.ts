@@ -49,6 +49,7 @@ const META: Record<string, GeoMeta> = {
   "specialty-coffee-mexico-city-mexico": { continent: "North America", country: "Mexico" },
 
   // South America
+  "specialty-coffee-buenos-aires-argentina": { continent: "South America", country: "Argentina" },
   "best-coffee-sao-paulo": { continent: "South America", country: "Brazil" },
   "coffee-rio-de-janeiro": { continent: "South America", country: "Brazil" },
 
@@ -81,6 +82,7 @@ export function getCityGeo(slug: string): GeoMeta {
 }
 
 const COUNTRY_FLAGS: Record<string, string> = {
+  "Argentina": "🇦🇷",
   "Netherlands": "🇳🇱",
   "Spain": "🇪🇸",
   "Belgium": "🇧🇪",
