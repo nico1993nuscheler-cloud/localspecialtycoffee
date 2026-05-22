@@ -14,6 +14,7 @@ export type GeoMeta = { continent: Continent; country: string };
 
 const META: Record<string, GeoMeta> = {
   // Europe
+  "specialty-coffee-dublin": { continent: "Europe", country: "Ireland" },
   "best-coffee-in-amsterdam": { continent: "Europe", country: "Netherlands" },
   "best-coffee-in-barcelona": { continent: "Europe", country: "Spain" },
   "best-coffee-in-brussels": { continent: "Europe", country: "Belgium" },
@@ -83,6 +84,7 @@ export function getCityGeo(slug: string): GeoMeta {
 }
 
 const COUNTRY_FLAGS: Record<string, string> = {
+  "Ireland": "🇮🇪",
   "Colombia": "🇨🇴",
   "Argentina": "🇦🇷",
   "Netherlands": "🇳🇱",
