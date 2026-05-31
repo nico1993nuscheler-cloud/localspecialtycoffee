@@ -26,6 +26,14 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "/",
+    // Single-language English site serving 6 continents — declare
+    // x-default so Google knows there's no localized version to look for.
+    // Per-route generateMetadata can override the language list later when
+    // translations ship.
+    languages: {
+      "x-default": "/",
+      en: "/",
+    },
   },
 };
 

@@ -26,6 +26,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticPages: MetadataRoute.Sitemap = [
     { url: `${BASE}`, lastModified: DEPLOY_TIME, changeFrequency: "weekly", priority: 1 },
     { url: `${BASE}/cities`, lastModified: DEPLOY_TIME, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${BASE}/about`, lastModified: DEPLOY_TIME, changeFrequency: "monthly", priority: 0.5 },
     { url: `${BASE}/contact`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE}/faqs`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE}/terms-conditions`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.1 },
@@ -34,12 +35,35 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/imprint`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.1 },
   ];
 
-  const cityUrls: MetadataRoute.Sitemap = allCities.map((c) => ({
-    url: `${BASE}/cities/${c.slug}`,
-    lastModified: toDate(c.updated_at ?? c.created_at),
-    changeFrequency: "weekly",
-    priority: 0.8,
-  }));
+  // Fetch places per city ONCE — used for both the city lastmod bump below
+  // and the programmatic landing-page emission further down. Hoisting avoids
+  // double-querying Supabase for every city.
+  const placesByCity = new Map<string, Awaited<ReturnType<typeof getPlacesInCity>>>();
+  await Promise.all(
+    allCities.map(async (c) => {
+      placesByCity.set(c.webflow_id, await getPlacesInCity(c.webflow_id));
+    }),
+  );
+
+  function newestPlaceDate(places: Awaited<ReturnType<typeof getPlacesInCity>>): number {
+    return places
+      .map((p) => toDate(p.updated_at ?? p.created_at).getTime())
+      .reduce((max, t) => (t > max ? t : max), 0);
+  }
+
+  const cityUrls: MetadataRoute.Sitemap = allCities.map((c) => {
+    // A new cafe joining a city's shortlist counts as a city-page update —
+    // otherwise Google sees no lastmod change and won't recrawl for weeks.
+    const cityDate = toDate(c.updated_at ?? c.created_at).getTime();
+    const placeDate = newestPlaceDate(placesByCity.get(c.webflow_id) ?? []);
+    const newest = Math.max(cityDate, placeDate);
+    return {
+      url: `${BASE}/cities/${c.slug}`,
+      lastModified: newest > 0 ? new Date(newest) : DEPLOY_TIME,
+      changeFrequency: "weekly",
+      priority: 0.8,
+    };
+  });
 
   const placeUrls: MetadataRoute.Sitemap = allPlaces.map((p) => ({
     url: `${BASE}/specialty-coffee-place/${p.slug}`,
@@ -61,15 +85,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // dilute crawl budget.
   const landingUrls: MetadataRoute.Sitemap = [];
   for (const c of allCities) {
-    const places = await getPlacesInCity(c.webflow_id);
+    const places = placesByCity.get(c.webflow_id) ?? [];
     for (const f of LANDING_FEATURES) {
       const matching = places.filter(
         (p) => (p as unknown as Record<string, boolean>)[f.boolean],
       );
       if (matching.length >= MIN_INDEXABLE_LANDING_PLACES) {
-        const newest = matching
-          .map((p) => toDate(p.updated_at ?? p.created_at).getTime())
-          .reduce((max, t) => (t > max ? t : max), 0);
+        const newest = newestPlaceDate(matching);
         landingUrls.push({
           url: `${BASE}/cities/${c.slug}/${f.slug}`,
           lastModified: newest > 0 ? new Date(newest) : DEPLOY_TIME,

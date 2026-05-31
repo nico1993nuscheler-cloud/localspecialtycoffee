@@ -45,8 +45,39 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
     ],
   };
 
+  // CollectionPage + ItemList of every place in the category — gives Google
+  // a machine-readable listing of all ~100+ cafes/roasters/courses tagged
+  // here. Without this the page is a giant hub with zero structured signal.
+  const itemListLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `${cat.name}s worldwide`,
+    numberOfItems: places.length,
+    itemListElement: places.map((p, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `https://www.localspecialtycoffee.com/specialty-coffee-place/${p.slug}`,
+      name: p.name,
+    })),
+  };
+
+  const collectionPageLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `https://www.localspecialtycoffee.com/categories/${cat.slug}#collection`,
+    url: `https://www.localspecialtycoffee.com/categories/${cat.slug}`,
+    name: `Local ${cat.name}s in your city`,
+    description: cat.description ?? `Browse the best ${cat.name.toLowerCase()}s curated by Local Specialty Coffee.`,
+    inLanguage: "en",
+    mainEntity: itemListLd,
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageLd) }}
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}

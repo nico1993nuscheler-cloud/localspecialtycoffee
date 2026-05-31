@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getAllCities, getAllPlaces, getPlaceBySlug, getPlacesInCity } from "@/lib/data";
+import { getCityGeo } from "@/lib/geography";
 import { PlaceCard } from "@/components/PlaceCard";
 import { PlaceCTAs } from "@/components/PlaceCTAs";
 import { Gallery } from "@/components/Gallery";
@@ -125,15 +126,56 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
     .filter((o) => o.webflow_id !== p.webflow_id)
     .slice(0, 3);
 
-  const localBusinessLd = {
+  // Schema.org LocalBusiness enrichment — these fields are what Google's
+  // local pack + map carousel actually use to render rich results. Without
+  // addressCountry + aggregateRating cafes don't surface for "near me"
+  // queries; with them they can pull star treatment in SERPs.
+  const geo = getCityGeo(p.city.slug);
+  const parsedRating = p.rating ? parseFloat(p.rating) : NaN;
+  const aggregateRating = !Number.isNaN(parsedRating) && parsedRating > 0
+    ? { "@type": "AggregateRating", ratingValue: parsedRating.toFixed(1), bestRating: "5", ratingCount: 1 }
+    : undefined;
+
+  // Build amenityFeature list from the boolean flags Supabase tracks. These
+  // are exactly the same flags the Features panel renders on-page.
+  const amenityMap: Record<string, string> = {
+    in_house_roasting: "In-house roasting",
+    single_origin: "Single origin",
+    hand_brews: "Hand brews / pour over",
+    espresso_milk_drinks: "Espresso & milk drinks",
+    alt_milk: "Alt milk",
+    cold_brew: "Cold brew",
+    decaf_options: "Decaf options",
+    outdoor_seating: "Outdoor seating",
+    work_friendly: "Work-friendly",
+    pet_friendly: "Pet friendly",
+    pastry_snacks: "Pastries / snacks",
+    lunch_brunch: "Lunch / brunch",
+    offers_classes: "Barista classes",
+  };
+  const amenityFeature = Object.entries(amenityMap)
+    .filter(([k]) => (p as unknown as Record<string, boolean>)[k])
+    .map(([, label]) => ({ "@type": "LocationFeatureSpecification", name: label, value: true }));
+
+  const localBusinessLd: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "CafeOrCoffeeShop",
+    "@id": `https://www.localspecialtycoffee.com/specialty-coffee-place/${p.slug}#cafe`,
     name: p.name,
     image: p.featured_image_url,
     description: p.flavour_profile ?? p.excerpt_short,
-    address: { "@type": "PostalAddress", streetAddress: p.address, addressLocality: p.city.name },
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: p.address,
+      addressLocality: p.city.name,
+      addressCountry: geo.country,
+    },
     url: p.website,
     telephone: p.phone,
+    servesCuisine: "Specialty Coffee",
+    priceRange: "$$",
+    ...(aggregateRating ? { aggregateRating } : {}),
+    ...(amenityFeature.length > 0 ? { amenityFeature } : {}),
   };
 
   const breadcrumbLd = {

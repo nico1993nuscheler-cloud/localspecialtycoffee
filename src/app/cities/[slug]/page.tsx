@@ -54,16 +54,32 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
     getAllCategories(),
   ]);
 
+  // CollectionPage wraps the city listing with topical signal: the page is
+  // ABOUT the city's coffee scene, not just a list. mainEntity links to the
+  // ItemList — this is the canonical Google pattern for "best X in Y" pages.
   const itemListLd = {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: `Best specialty coffee in ${city.name}`,
+    numberOfItems: places.length,
     itemListElement: places.map((p, i) => ({
       "@type": "ListItem",
       position: i + 1,
       url: `https://www.localspecialtycoffee.com/specialty-coffee-place/${p.slug}`,
       name: p.name,
     })),
+  };
+
+  const collectionPageLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `https://www.localspecialtycoffee.com/cities/${city.slug}#collection`,
+    url: `https://www.localspecialtycoffee.com/cities/${city.slug}`,
+    name: city.h1 ?? `Specialty Coffee in ${city.name}`,
+    description: city.summary ?? `Curated guide to specialty coffee in ${city.name}.`,
+    inLanguage: "en",
+    about: { "@type": "City", name: city.name },
+    mainEntity: itemListLd,
   };
 
   const breadcrumbLd = {
@@ -80,7 +96,7 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageLd) }}
       />
       <script
         type="application/ld+json"

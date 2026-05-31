@@ -20,8 +20,51 @@ export default async function CitiesPage() {
     })),
   );
 
+  // CollectionPage + full ItemList of all cities. Previously this hub
+  // shipped with zero structured data — Google had no machine-readable
+  // signal that this is THE directory page for every city we cover.
+  const itemListLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Specialty coffee cities worldwide",
+    numberOfItems: cities.length,
+    itemListElement: cities.map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `https://www.localspecialtycoffee.com/cities/${c.slug}`,
+      name: c.name,
+    })),
+  };
+  const collectionPageLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": "https://www.localspecialtycoffee.com/cities#collection",
+    url: "https://www.localspecialtycoffee.com/cities",
+    name: "Explore Coffee Cities Around the World",
+    description:
+      "Discover a curated list of cities renowned for their unique coffee scenes.",
+    inLanguage: "en",
+    mainEntity: itemListLd,
+  };
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.localspecialtycoffee.com/" },
+      { "@type": "ListItem", position: 2, name: "Cities", item: "https://www.localspecialtycoffee.com/cities" },
+    ],
+  };
+
   return (
     <section className="py-12">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionPageLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
       <div className="max-w-6xl mx-auto px-6">
         <h1 className="text-4xl md:text-5xl font-bold mb-3">All cities</h1>
         <p className="text-lg text-muted mb-10 max-w-2xl">
