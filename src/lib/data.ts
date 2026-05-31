@@ -3,10 +3,11 @@
 // unstable_cache's 2 MB-per-entry limit.
 //
 // revalidate is 30 days on purpose: invalidation happens via deploys
-// (every CMS injection ends in a push) and on-demand `updateTag("lsc-data")`
-// hits to /api/revalidate from scripts/inject-city.mjs. Do NOT lower this
-// timer — short windows generated 1.7M ISR Writes/cycle (~$7) when the
-// data was effectively static between deploys.
+// (every CMS injection ends in a push) and on-demand
+// `revalidateTag("lsc-data", "max")` hits to /api/revalidate from
+// scripts/inject-city.mjs. Do NOT lower this timer — short windows
+// generated 1.7M ISR Writes/cycle (~$7) when the data was effectively
+// static between deploys.
 //
 // Two-tier loading:
 //   - getAllPlaces() / getPlacesInCity() / etc. return LIGHT rows (no

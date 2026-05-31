@@ -1,4 +1,4 @@
-import { updateTag } from "next/cache";
+import { revalidateTag } from "next/cache";
 import { NextResponse } from "next/server";
 
 // On-demand cache invalidation for the `lsc-data` tag.
@@ -8,9 +8,8 @@ import { NextResponse } from "next/server";
 // HTTP POST flushes the unstable_cache + page-level ISR entries tagged
 // "lsc-data" in seconds, without burning a build.
 //
-// Uses `updateTag` (Next 16's single-arg replacement for the old
-// `revalidateTag(tag)` API — the new `revalidateTag` requires a cache
-// profile and is Server-Action-only).
+// Uses `revalidateTag(tag, "max")` — Next 16's route-handler-safe API.
+// `"max"` = immediate purge (the alternative `updateTag` is Server-Action-only).
 //
 // Token check is required — without REVALIDATE_TOKEN set we 503 rather
 // than silently accept anything, so a misconfigured env never opens the
@@ -41,6 +40,6 @@ export async function POST(req: Request) {
     // empty body is fine — default to lsc-data
   }
 
-  updateTag(tag);
+  revalidateTag(tag, "max");
   return NextResponse.json({ ok: true, tag, revalidatedAt: new Date().toISOString() });
 }
