@@ -14,7 +14,7 @@ import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 import { TrendingShuffle } from "@/components/TrendingShuffle";
 import { FeaturedCitiesGrid } from "@/components/FeaturedCitiesGrid";
 
-export const revalidate = 600;
+export const revalidate = 2592000;
 
 const CATEGORY_TAGLINES: Record<string, string> = {
   "specialty-coffee-shops": "Hand-picked cafés near you",
@@ -49,8 +49,30 @@ export default async function HomePage() {
 
   const citiesWithCounts = citiesWithCountsArr;
 
+  // Homepage ItemList — give Google an explicit list of the featured cities
+  // so the homepage can earn richer SERP treatment (sitelinks, list cards)
+  // and so crawl-prioritization picks up new cities faster.
+  const homepageItemListLd = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Featured specialty coffee cities",
+    itemListOrder: "https://schema.org/ItemListOrderAscending",
+    numberOfItems: citiesWithCounts.length,
+    itemListElement: citiesWithCounts.slice(0, 30).map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      url: `https://www.localspecialtycoffee.com/cities/${c.slug}`,
+      name: c.h1 ?? c.name,
+    })),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageItemListLd) }}
+      />
+
       {/* Hero with collage */}
       <section className="bg-bg pt-10 pb-20 motion-safe:animate-fade-up">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-[1fr_1.2fr] gap-12 items-center">

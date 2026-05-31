@@ -105,3 +105,9 @@ export const LANDING_FEATURES: Feature[] = [
 export const FEATURE_BY_SLUG: Record<string, Feature> = Object.fromEntries(
   LANDING_FEATURES.map((f) => [f.slug, f]),
 );
+
+// Minimum number of matching places required for a programmatic landing
+// combo to be indexable. Below this, the page still resolves (so direct
+// links work) but is excluded from the sitemap and serves noindex,follow
+// so Google doesn't rank thin/duplicate content.
+export const MIN_INDEXABLE_LANDING_PLACES = 3;

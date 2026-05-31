@@ -7,14 +7,20 @@ import {
   getCityBySlug,
   getPlacesInCity,
 } from "@/lib/data";
-import { LANDING_FEATURES, FEATURE_BY_SLUG } from "@/lib/landing-features";
+import {
+  LANDING_FEATURES,
+  FEATURE_BY_SLUG,
+  MIN_INDEXABLE_LANDING_PLACES,
+} from "@/lib/landing-features";
 import { PlaceCard } from "@/components/PlaceCard";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 
 export const dynamicParams = true;
-export const revalidate = 300;
+export const revalidate = 2592000;
 
 export async function generateStaticParams() {
+  // Pre-render only the indexable combos; thinner ones still resolve at
+  // runtime (dynamicParams = true) but serve noindex,follow.
   const params: { slug: string; feature: string }[] = [];
   const cities = await getAllCities();
   for (const c of cities) {
@@ -23,7 +29,7 @@ export async function generateStaticParams() {
       const matches = places.filter(
         (p) => (p as unknown as Record<string, boolean>)[f.boolean],
       );
-      if (matches.length >= 1) {
+      if (matches.length >= MIN_INDEXABLE_LANDING_PLACES) {
         params.push({ slug: c.slug, feature: f.slug });
       }
     }
@@ -41,11 +47,20 @@ export async function generateMetadata({
   const f = FEATURE_BY_SLUG[feature];
   if (!city || !f) return {};
 
+  const placesInCity = await getPlacesInCity(city.webflow_id);
+  const matchCount = placesInCity.filter(
+    (p) => (p as unknown as Record<string, boolean>)[f.boolean],
+  ).length;
+  const indexable = matchCount >= MIN_INDEXABLE_LANDING_PLACES;
+
   const year = new Date().getFullYear();
   return {
     title: `Best ${f.metaTitleWord} Coffee Shops in ${city.name} (${year})`,
     description: `${f.intro} Curated picks across ${city.name}.`,
     alternates: { canonical: `/cities/${city.slug}/${f.slug}` },
+    // Thin combos are kept reachable for direct links + crawler discovery
+    // but marked noindex so they don't dilute the site's quality signals.
+    robots: indexable ? undefined : { index: false, follow: true },
     openGraph: {
       title: `${f.metaTitleWord} coffee shops in ${city.name}`,
       description: f.intro,

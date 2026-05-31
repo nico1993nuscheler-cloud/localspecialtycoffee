@@ -9,7 +9,7 @@ import { Gallery } from "@/components/Gallery";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 
 export const dynamicParams = true;
-export const revalidate = 120;
+export const revalidate = 2592000;
 
 export async function generateStaticParams() {
   return (await getAllPlaces()).map((p) => ({ slug: p.slug }));

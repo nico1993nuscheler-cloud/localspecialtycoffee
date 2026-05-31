@@ -28,8 +28,13 @@
  *   --city-filter STRING  (substring to require in formattedAddress, e.g. "Wien")
  *
  * Cost (Vienna, 15 cafes, defaults):
- *   ~ $0.50 Text Search + $0.30 Place Details + $0.50 Place Photo ≈ $1.30
- *   Comfortably inside Google's $200/month Maps Platform free credit.
+ *   Under Google Maps Platform's per-SKU free tier (effective March 1, 2025):
+ *     - Pro SKUs (Text Search, Place Details w/ photos): 5,000 free calls/month each
+ *     - Essentials SKUs (Place Photo): 10,000 free calls/month
+ *   A full 15-cafe city run = 15+15+75 = 105 calls total. We're at <1% of
+ *   any free bucket. You'd need to launch ~330 cities/month to leave the
+ *   free tier. Note: the old "$200/month recurring credit" no longer exists —
+ *   replaced by the per-SKU buckets above.
  */
 
 import fs from "node:fs/promises";

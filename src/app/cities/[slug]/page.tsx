@@ -1,14 +1,19 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getAllCategories, getAllCities, getCityBySlug, getPlacesInCity } from "@/lib/data";
+import {
+  getAllCategories,
+  getAllCities,
+  getCityBySlug,
+  getPlacesInCity,
+} from "@/lib/data";
 import { PlaceFilters } from "@/components/PlaceFilters";
 import { Gallery } from "@/components/Gallery";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 import { CityFeatureLinks } from "@/components/CityFeatureLinks";
 
 export const dynamicParams = true;
-export const revalidate = 120;
+export const revalidate = 2592000;
 
 export async function generateStaticParams() {
   return (await getAllCities()).map((c) => ({ slug: c.slug }));
@@ -18,8 +23,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const city = await getCityBySlug(slug);
   if (!city) return {};
+  // Count is the real, current shortlist size — the old "TOP 10" prefix
+  // was misleading when most cities actually ship 13-15 cafés. Mismatched
+  // titles cost CTR and trust signals.
+  const places = await getPlacesInCity(city.webflow_id);
+  const year = new Date().getFullYear();
+  const baseTitle = city.h1 ?? city.name;
+  const title =
+    places.length > 0
+      ? `Top ${places.length} - ${baseTitle} (${year})`
+      : `${baseTitle} (${year})`;
   return {
-    title: `TOP 10 - ${city.h1 ?? city.name} (${new Date().getFullYear()})`,
+    title,
     description: city.meta_description ?? `Discover the best specialty coffee in ${city.name}.`,
     alternates: { canonical: `/cities/${city.slug}` },
     openGraph: {

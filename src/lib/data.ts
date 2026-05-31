@@ -2,6 +2,12 @@
 // revalidation, caches each table separately to fit inside Next.js
 // unstable_cache's 2 MB-per-entry limit.
 //
+// revalidate is 30 days on purpose: invalidation happens via deploys
+// (every CMS injection ends in a push) and on-demand `revalidateTag("lsc-data")`
+// hits to /api/revalidate from scripts/inject-city.mjs. Do NOT lower this
+// timer — short windows generated 1.7M ISR Writes/cycle (~$7) when the
+// data was effectively static between deploys.
+//
 // Two-tier loading:
 //   - getAllPlaces() / getPlacesInCity() / etc. return LIGHT rows (no
 //     full HTML `about` / `seo_paragraph`) — enough for list / card views
@@ -16,6 +22,13 @@ import "server-only";
 import { unstable_cache } from "next/cache";
 import { supabase } from "./supabase";
 import type { Category, City, Place, PlaceWithRefs } from "./types";
+import {
+  PREVIEW_ENABLED,
+  PREVIEW_CITY_SLUG,
+  PREVIEW_CITY_WEBFLOW_ID,
+  getPreviewCity,
+  getPreviewPlaces,
+} from "./preview-singapore";
 
 // Slim variants: keep the same TS shapes as City / Place but with heavy
 // HTML fields nulled out. List-view components don't read them; the city
@@ -30,7 +43,7 @@ const loadCategories = unstable_cache(
     return data as Category[];
   },
   ["lsc-categories"],
-  { revalidate: 300, tags: ["lsc-data"] },
+  { revalidate: 2592000, tags: ["lsc-data"] },
 );
 
 const loadCities = unstable_cache(
@@ -38,13 +51,23 @@ const loadCities = unstable_cache(
     const { data, error } = await supabase
       .from("lsc_cities")
       .select(
-        "webflow_id,slug,name,h1,meta_description,summary,excerpt_short,excerpt_long,seo_h2,thumbnail_v1_url,thumbnail_v2_url,thumbnail_v3_url,featured_image_url,photo_gallery,google_maps_url",
+        "webflow_id,slug,name,h1,meta_description,summary,excerpt_short,excerpt_long,seo_h2,thumbnail_v1_url,thumbnail_v2_url,thumbnail_v3_url,featured_image_url,photo_gallery,google_maps_url,created_at",
       );
     if (error) throw error;
-    return (data as Array<Record<string, unknown>>).map((r) => ({ ...r, seo_paragraph: null } as unknown as CityLight));
+    return (data as Array<Record<string, unknown>>).map(
+      (r) =>
+        ({
+          ...r,
+          seo_paragraph: null,
+          // updated_at column added separately via migration — read it if
+          // present, otherwise fall back to created_at so sitemap lastmod
+          // still has a real per-row value.
+          updated_at: (r as Record<string, unknown>).updated_at ?? r.created_at ?? null,
+        }) as unknown as CityLight,
+    );
   },
   ["lsc-cities-light"],
-  { revalidate: 300, tags: ["lsc-data"] },
+  { revalidate: 2592000, tags: ["lsc-data"] },
 );
 
 // Resolve city_id (uuid) → webflow_id once, cached. Tiny.
@@ -55,7 +78,7 @@ const loadCityIdMap = unstable_cache(
     return Object.fromEntries(data.map((r) => [r.id, r.webflow_id]));
   },
   ["lsc-city-id-map"],
-  { revalidate: 300, tags: ["lsc-data"] },
+  { revalidate: 2592000, tags: ["lsc-data"] },
 );
 const loadCategoryIdMap = unstable_cache(
   async (): Promise<Record<string, string>> => {
@@ -64,7 +87,7 @@ const loadCategoryIdMap = unstable_cache(
     return Object.fromEntries(data.map((r) => [r.id, r.webflow_id]));
   },
   ["lsc-category-id-map"],
-  { revalidate: 300, tags: ["lsc-data"] },
+  { revalidate: 2592000, tags: ["lsc-data"] },
 );
 
 const loadPlacesLight = unstable_cache(
@@ -74,7 +97,7 @@ const loadPlacesLight = unstable_cache(
     const { data, error } = await supabase
       .from("lsc_coffee_places")
       .select(
-        "webflow_id,slug,name,city_id,category_id,excerpt_short,excerpt_long,flavour_profile,button_text,rating,address,hours_weekday,hours_saturday,hours_sunday,thumbnail_v1_url,thumbnail_v2_url,thumbnail_v3_url,featured_image_url,photo_gallery,website,instagram,booking_link,phone,email,is_featured,in_house_roasting,ethical_sourcing,single_origin,award_winning,micro_lots,experimental_styles,hand_brews,batch_brews,espresso_milk_drinks,decaf_options,alt_milk,cold_brew,offers_classes,retail_beans,online_beans,pastry_snacks,lunch_brunch,work_friendly,outdoor_seating,pet_friendly,certified_baristas,ships_internationally,subscription,to_go,byo_cup_loyalty,community_events",
+        "webflow_id,slug,name,city_id,category_id,excerpt_short,excerpt_long,flavour_profile,button_text,rating,address,hours_weekday,hours_saturday,hours_sunday,thumbnail_v1_url,thumbnail_v2_url,thumbnail_v3_url,featured_image_url,photo_gallery,website,instagram,booking_link,phone,email,is_featured,in_house_roasting,ethical_sourcing,single_origin,award_winning,micro_lots,experimental_styles,hand_brews,batch_brews,espresso_milk_drinks,decaf_options,alt_milk,cold_brew,offers_classes,retail_beans,online_beans,pastry_snacks,lunch_brunch,work_friendly,outdoor_seating,pet_friendly,certified_baristas,ships_internationally,subscription,to_go,byo_cup_loyalty,community_events,created_at",
       );
     if (error) throw error;
 
@@ -85,13 +108,15 @@ const loadPlacesLight = unstable_cache(
         ...rest,
         about: null,
         summary: null,
+        // updated_at falls back to created_at if migration not yet applied
+        updated_at: (p as Record<string, unknown>).updated_at ?? p.created_at ?? null,
         city_webflow_id: cityMap[city_id as string] ?? "",
         category_webflow_id: catMap[category_id as string] ?? "",
       } as unknown as PlaceLight;
     });
   },
   ["lsc-places-light"],
-  { revalidate: 120, tags: ["lsc-data"] },
+  { revalidate: 2592000, tags: ["lsc-data"] },
 );
 
 // ── Public API ──
@@ -102,11 +127,13 @@ export async function getAllCategories(): Promise<Category[]> {
 
 export async function getAllCities(): Promise<CityLight[]> {
   const cities = await loadCities();
-  return [...cities].sort((a, b) => a.name.localeCompare(b.name));
+  const merged = PREVIEW_ENABLED ? [...cities, getPreviewCity()] : cities;
+  return [...merged].sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export async function getAllPlaces(): Promise<PlaceLight[]> {
-  return loadPlacesLight();
+  const places = await loadPlacesLight();
+  return PREVIEW_ENABLED ? [...places, ...getPreviewPlaces()] : places;
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | undefined> {
@@ -116,6 +143,7 @@ export async function getCategoryBySlug(slug: string): Promise<Category | undefi
 
 /** Full city row including seo_paragraph (used on city detail page). */
 export async function getCityBySlug(slug: string): Promise<City | undefined> {
+  if (PREVIEW_ENABLED && slug === PREVIEW_CITY_SLUG) return getPreviewCity();
   const { data, error } = await supabase
     .from("lsc_cities")
     .select("*")
@@ -128,6 +156,14 @@ export async function getCityBySlug(slug: string): Promise<City | undefined> {
 
 /** Full place row including `about` HTML (used on cafe detail page). */
 export async function getPlaceBySlug(slug: string): Promise<PlaceWithRefs | undefined> {
+  if (PREVIEW_ENABLED) {
+    const previewPlace = getPreviewPlaces().find((p) => p.slug === slug);
+    if (previewPlace) {
+      const cats = await loadCategories();
+      const category = cats.find((c) => c.webflow_id === previewPlace.category_webflow_id);
+      if (category) return { ...previewPlace, city: getPreviewCity(), category };
+    }
+  }
   const { data, error } = await supabase
     .from("lsc_coffee_places")
     .select("*")
@@ -159,15 +195,17 @@ export async function getPlaceBySlug(slug: string): Promise<PlaceWithRefs | unde
 }
 
 export async function getPlacesInCity(cityWebflowId: string): Promise<PlaceWithRefs[]> {
-  const [places, cities, categories] = await Promise.all([
+  const [livePlaces, cities, categories] = await Promise.all([
     loadPlacesLight(),
     loadCities(),
     loadCategories(),
   ]);
+  const allCities = PREVIEW_ENABLED ? [...cities, getPreviewCity()] : cities;
+  const places = PREVIEW_ENABLED ? [...livePlaces, ...getPreviewPlaces()] : livePlaces;
   return places
     .filter((p) => p.city_webflow_id === cityWebflowId)
     .map((p) => {
-      const city = cities.find((c) => c.webflow_id === p.city_webflow_id);
+      const city = allCities.find((c) => c.webflow_id === p.city_webflow_id);
       const category = categories.find((c) => c.webflow_id === p.category_webflow_id);
       if (!city || !category) return null;
       return { ...(p as unknown as Place), city: city as unknown as City, category };
@@ -180,15 +218,17 @@ export async function getPlacesInCity(cityWebflowId: string): Promise<PlaceWithR
 }
 
 export async function getPlacesInCategory(categoryWebflowId: string): Promise<PlaceWithRefs[]> {
-  const [places, cities, categories] = await Promise.all([
+  const [livePlaces, cities, categories] = await Promise.all([
     loadPlacesLight(),
     loadCities(),
     loadCategories(),
   ]);
+  const allCities = PREVIEW_ENABLED ? [...cities, getPreviewCity()] : cities;
+  const places = PREVIEW_ENABLED ? [...livePlaces, ...getPreviewPlaces()] : livePlaces;
   return places
     .filter((p) => p.category_webflow_id === categoryWebflowId)
     .map((p) => {
-      const city = cities.find((c) => c.webflow_id === p.city_webflow_id);
+      const city = allCities.find((c) => c.webflow_id === p.city_webflow_id);
       const category = categories.find((c) => c.webflow_id === p.category_webflow_id);
       if (!city || !category) return null;
       return { ...(p as unknown as Place), city: city as unknown as City, category };
@@ -198,6 +238,7 @@ export async function getPlacesInCategory(categoryWebflowId: string): Promise<Pl
 }
 
 export async function countPlacesInCity(cityWebflowId: string): Promise<number> {
-  const places = await loadPlacesLight();
+  const livePlaces = await loadPlacesLight();
+  const places = PREVIEW_ENABLED ? [...livePlaces, ...getPreviewPlaces()] : livePlaces;
   return places.filter((p) => p.city_webflow_id === cityWebflowId).length;
 }

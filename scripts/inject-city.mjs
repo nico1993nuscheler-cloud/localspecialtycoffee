@@ -367,10 +367,50 @@ async function main() {
   console.log("\n[5/5] Geography mapping (src/lib/geography.ts)");
   await ensureGeographyEntry(pkg.city, opts);
 
+  // Cache flush: hit /api/revalidate so the new city + cafes surface
+  // immediately. Falls back to the old "push an empty commit" instruction
+  // if REVALIDATE_TOKEN / REVALIDATE_URL aren't set.
+  await flushVercelCache(opts);
+
   console.log("\n✓ Done");
   console.log(`  City: ${publicBase}/cities/${city.slug}`);
   console.log(`  Verify: https://www.localspecialtycoffee.com/cities/${city.slug}`);
-  console.log(`  Next: commit + push src/lib/geography.ts to flush Vercel cache and surface continent/country tags.`);
+}
+
+async function flushVercelCache(opts) {
+  const url = process.env.REVALIDATE_URL ?? "https://www.localspecialtycoffee.com/api/revalidate";
+  const token = process.env.REVALIDATE_TOKEN;
+  if (!token) {
+    console.log("\n[6/6] Cache flush — SKIPPED (REVALIDATE_TOKEN not set in .env.local).");
+    console.log("       Fallback: push an empty commit to flush via redeploy:");
+    console.log("         git commit --allow-empty -m 'Flush cache for new city' && git push");
+    return;
+  }
+  if (opts.dryRun) {
+    console.log(`\n[6/6] Cache flush — [dry-run] would POST ${url}`);
+    return;
+  }
+  console.log(`\n[6/6] Cache flush — POST ${url}`);
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ tag: "lsc-data" }),
+    });
+    const body = await res.text();
+    if (!res.ok) {
+      console.warn(`    ⚠️  revalidate endpoint returned ${res.status}: ${body}`);
+      console.warn(`        Fallback: push an empty commit to flush via redeploy.`);
+      return;
+    }
+    console.log(`    ✓ ${body}`);
+  } catch (err) {
+    console.warn(`    ⚠️  revalidate request failed: ${err.message}`);
+    console.warn(`        Fallback: push an empty commit to flush via redeploy.`);
+  }
 }
 
 async function ensureGeographyEntry(city, opts) {

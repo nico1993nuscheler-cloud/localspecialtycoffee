@@ -25,6 +25,8 @@ export type City = {
   featured_image_url: string | null;
   photo_gallery: string[];
   google_maps_url: string | null;
+  created_at: string | null;
+  updated_at: string | null;
 };
 
 export type Place = {
@@ -82,6 +84,8 @@ export type Place = {
   to_go: boolean;
   byo_cup_loyalty: boolean;
   community_events: boolean;
+  created_at: string | null;
+  updated_at: string | null;
 };
 
 export type PlaceWithRefs = Place & {

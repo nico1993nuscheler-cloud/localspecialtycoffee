@@ -1,8 +1,19 @@
 import type { MetadataRoute } from "next";
 import { getAllCities, getAllPlaces, getAllCategories, getPlacesInCity } from "@/lib/data";
-import { LANDING_FEATURES } from "@/lib/landing-features";
+import { LANDING_FEATURES, MIN_INDEXABLE_LANDING_PLACES } from "@/lib/landing-features";
 
 const BASE = "https://www.localspecialtycoffee.com";
+
+// Build/deploy timestamp — used as lastmod for static pages that have no
+// per-row date in the DB. Captured at module evaluation, so it bumps every
+// time we deploy.
+const DEPLOY_TIME = new Date();
+
+function toDate(value: string | null | undefined): Date {
+  if (!value) return DEPLOY_TIME;
+  const d = new Date(value);
+  return isNaN(d.getTime()) ? DEPLOY_TIME : d;
+}
 
 export const revalidate = 3600;
 
@@ -12,46 +23,56 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getAllPlaces(),
     getAllCategories(),
   ]);
-  const staticPages = [
-    { url: `${BASE}`, changeFrequency: "weekly" as const, priority: 1 },
-    { url: `${BASE}/cities`, changeFrequency: "weekly" as const, priority: 0.9 },
-    { url: `${BASE}/contact`, changeFrequency: "yearly" as const, priority: 0.3 },
-    { url: `${BASE}/faqs`, changeFrequency: "yearly" as const, priority: 0.3 },
-    { url: `${BASE}/terms-conditions`, changeFrequency: "yearly" as const, priority: 0.1 },
-    { url: `${BASE}/submissions`, changeFrequency: "yearly" as const, priority: 0.4 },
-    { url: `${BASE}/privacy`, changeFrequency: "yearly" as const, priority: 0.2 },
-    { url: `${BASE}/imprint`, changeFrequency: "yearly" as const, priority: 0.1 },
+  const staticPages: MetadataRoute.Sitemap = [
+    { url: `${BASE}`, lastModified: DEPLOY_TIME, changeFrequency: "weekly", priority: 1 },
+    { url: `${BASE}/cities`, lastModified: DEPLOY_TIME, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${BASE}/contact`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${BASE}/faqs`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.3 },
+    { url: `${BASE}/terms-conditions`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.1 },
+    { url: `${BASE}/submissions`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${BASE}/privacy`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${BASE}/imprint`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.1 },
   ];
 
-  const cityUrls = allCities.map((c) => ({
+  const cityUrls: MetadataRoute.Sitemap = allCities.map((c) => ({
     url: `${BASE}/cities/${c.slug}`,
-    changeFrequency: "weekly" as const,
+    lastModified: toDate(c.updated_at ?? c.created_at),
+    changeFrequency: "weekly",
     priority: 0.8,
   }));
 
-  const placeUrls = allPlaces.map((p) => ({
+  const placeUrls: MetadataRoute.Sitemap = allPlaces.map((p) => ({
     url: `${BASE}/specialty-coffee-place/${p.slug}`,
-    changeFrequency: "monthly" as const,
+    lastModified: toDate(p.updated_at ?? p.created_at),
+    changeFrequency: "monthly",
     priority: 0.7,
   }));
 
-  const categoryUrls = allCategories.map((c) => ({
+  const categoryUrls: MetadataRoute.Sitemap = allCategories.map((c) => ({
     url: `${BASE}/categories/${c.slug}`,
-    changeFrequency: "monthly" as const,
+    lastModified: DEPLOY_TIME,
+    changeFrequency: "monthly",
     priority: 0.6,
   }));
 
-  // Programmatic landing pages: only emit combos with ≥1 matching place.
+  // Programmatic landing pages: only emit combos with ≥ MIN_PLACES_PER_LANDING
+  // matching places. Thin programmatic pages were a primary Helpful-Content
+  // demotion vector in the 2025 updates — better to noindex by omission than
+  // dilute crawl budget.
   const landingUrls: MetadataRoute.Sitemap = [];
   for (const c of allCities) {
     const places = await getPlacesInCity(c.webflow_id);
     for (const f of LANDING_FEATURES) {
-      const count = places.filter(
+      const matching = places.filter(
         (p) => (p as unknown as Record<string, boolean>)[f.boolean],
-      ).length;
-      if (count >= 1) {
+      );
+      if (matching.length >= MIN_INDEXABLE_LANDING_PLACES) {
+        const newest = matching
+          .map((p) => toDate(p.updated_at ?? p.created_at).getTime())
+          .reduce((max, t) => (t > max ? t : max), 0);
         landingUrls.push({
           url: `${BASE}/cities/${c.slug}/${f.slug}`,
+          lastModified: newest > 0 ? new Date(newest) : DEPLOY_TIME,
           changeFrequency: "monthly",
           priority: 0.65,
         });

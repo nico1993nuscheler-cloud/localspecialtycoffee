@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/cities" },
 };
 
-export const revalidate = 300;
+export const revalidate = 2592000;
 
 export default async function CitiesPage() {
   const all = await getAllCities();
