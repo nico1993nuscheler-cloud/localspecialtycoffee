@@ -31,18 +31,43 @@ function writePrefs(prefs: Prefs) {
   }
 }
 
+// Push a consent update to gtag if it's loaded. Safe to call before gtag
+// exists — Google's snippet bootstraps `dataLayer` and queues calls.
+function pushConsentUpdate(analytics: boolean, marketing: boolean) {
+  if (typeof window === "undefined") return;
+  type GtagWindow = Window & { gtag?: (...args: unknown[]) => void };
+  const w = window as GtagWindow;
+  const gtag = w.gtag;
+  if (typeof gtag !== "function") return;
+  gtag("consent", "update", {
+    analytics_storage: analytics ? "granted" : "denied",
+    ad_storage: marketing ? "granted" : "denied",
+    ad_user_data: marketing ? "granted" : "denied",
+    ad_personalization: marketing ? "granted" : "denied",
+  });
+}
+
 export function CookieConsent() {
   const [open, setOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [prefs, setPrefs] = useState<Prefs | null>(null);
+  const [, setPrefs] = useState<Prefs | null>(null);
   const [draftAnalytics, setDraftAnalytics] = useState(false);
   const [draftMarketing, setDraftMarketing] = useState(false);
 
-  // Decide visibility on mount + listen for "open settings" events
+  // Decide visibility on mount + push the stored consent (if any) to gtag.
+  // GA4 always loads now, but with all consent signals defaulted to "denied"
+  // by the inline pre-init script below. After the user makes a choice we
+  // push a consent update; before they choose, GA4 sends cookieless,
+  // anonymized "consent denied" pings — which is what unlocks modeled
+  // conversions and traffic estimates in the GA4 UI.
   useEffect(() => {
     const stored = readPrefs();
     setPrefs(stored);
-    if (!stored) setOpen(true);
+    if (!stored) {
+      setOpen(true);
+    } else {
+      pushConsentUpdate(stored.analytics, stored.marketing);
+    }
 
     const onOpen = () => {
       const cur = readPrefs();
@@ -59,6 +84,7 @@ export function CookieConsent() {
     const next: Prefs = { analytics: true, marketing: true, decidedAt: new Date().toISOString() };
     writePrefs(next);
     setPrefs(next);
+    pushConsentUpdate(true, true);
     setOpen(false);
     setShowSettings(false);
   };
@@ -66,6 +92,7 @@ export function CookieConsent() {
     const next: Prefs = { analytics: false, marketing: false, decidedAt: new Date().toISOString() };
     writePrefs(next);
     setPrefs(next);
+    pushConsentUpdate(false, false);
     setOpen(false);
     setShowSettings(false);
   };
@@ -77,31 +104,46 @@ export function CookieConsent() {
     };
     writePrefs(next);
     setPrefs(next);
+    pushConsentUpdate(draftAnalytics, draftMarketing);
     setOpen(false);
     setShowSettings(false);
   };
 
-  const analyticsOn = prefs?.analytics === true;
-
   return (
     <>
-      {/* GA4 loaded ONLY after consent (analytics === true) */}
-      {analyticsOn && (
-        <>
-          <Script
-            src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
-            strategy="afterInteractive"
-          />
-          <Script id="ga4-init" strategy="afterInteractive">
-            {`
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', '${GA_ID}', { anonymize_ip: true });
-            `}
-          </Script>
-        </>
-      )}
+      {/*
+        Google Consent Mode v2 — set the default consent state to "denied"
+        BEFORE GA4's script loads. With this in place GA4 always loads but
+        respects the consent signal: visitors who haven't decided yet (or
+        who decline) send cookieless, anonymized pings, which GA4 uses to
+        model traffic + conversions. Previously GA4 was gated on consent
+        and never loaded for ~80% of visitors, so we saw a fake 85% drop
+        in active users the day this consent banner shipped (May 12, 2026).
+      */}
+      <Script id="ga4-consent-default" strategy="beforeInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          window.gtag = gtag;
+          gtag('consent', 'default', {
+            'analytics_storage': 'denied',
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
+            'wait_for_update': 500
+          });
+        `}
+      </Script>
+      <Script
+        src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+        strategy="afterInteractive"
+      />
+      <Script id="ga4-init" strategy="afterInteractive">
+        {`
+          gtag('js', new Date());
+          gtag('config', '${GA_ID}', { anonymize_ip: true });
+        `}
+      </Script>
 
       {/* Consent banner */}
       {open && (
