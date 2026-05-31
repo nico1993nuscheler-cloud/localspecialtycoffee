@@ -31,6 +31,20 @@ const nextConfig: NextConfig = {
       // Add Webflow-era URL → current-slug mappings here as you find them
       // in GSC → Pages → "Not found (404)". Pattern:
       //   { source: "/old-webflow-slug", destination: "/cities/new-slug", permanent: true },
+
+      // Retired cafe slug that the smart-fallback in
+      // /specialty-coffee-place/[slug]/page.tsx can't resolve because the
+      // slug has no recognizable city stem at the end. Seven Miles was a
+      // Sydney roaster removed from the shortlist; smart fallback misses
+      // it (no `-sydney` suffix), so route explicitly. Per Wayback diff
+      // (May 31, 2026), this is the only Webflow URL that genuinely needs
+      // a hand-mapped rule — every other slug either still exists or ends
+      // with a city stem the smart fallback already catches.
+      {
+        source: "/specialty-coffee-place/seven-miles-coffee-roasters--office---roastery",
+        destination: "/cities/best-coffee-in-sydney",
+        permanent: true,
+      },
     ];
   },
 };
