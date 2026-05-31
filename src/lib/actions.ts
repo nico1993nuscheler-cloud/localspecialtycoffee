@@ -183,6 +183,47 @@ function escapeHtml(s: string) {
   return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 }
 
+async function notifyNewSubscriber(tier: "newsletter" | "lead_magnet", email: string) {
+  if (!RESEND_API_KEY) {
+    console.error("[resend] missing RESEND_API_KEY — subscriber notification skipped", tier, email);
+    return;
+  }
+  const label = tier === "newsletter" ? "newsletter" : "lead-magnet";
+  const subject = `New ${label} signup: ${email}`;
+  const opener = `Someone just signed up for the ${label} on localspecialtycoffee.com.`;
+  const textBody = [
+    opener,
+    "",
+    `Email: ${email}`,
+    `Source: ${tier}`,
+    "",
+    "They've been added to MailerLite group 'localspecialtycoffee Maps Subscribers'.",
+    "",
+    "— sent from localspecialtycoffee.com",
+  ].join("\n");
+  const htmlBody = `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.5;color:#222;max-width:520px;">
+<p style="margin:0 0 16px 0;">${escapeHtml(opener)}</p>
+<p style="margin:0 0 10px 0;"><strong style="color:#222;">Email:</strong> ${escapeHtml(email)}</p>
+<p style="margin:0 0 10px 0;"><strong style="color:#222;">Source:</strong> ${escapeHtml(tier)}</p>
+<p style="margin:16px 0 0 0;color:#555;">They've been added to MailerLite group <em>localspecialtycoffee Maps Subscribers</em>.</p>
+<p style="margin:24px 0 0 0;color:#888;font-size:13px;">— sent from localspecialtycoffee.com</p>
+</div>`;
+
+  try {
+    const resend = new Resend(RESEND_API_KEY);
+    const { error } = await resend.emails.send({
+      from: NOTIFY_FROM,
+      to: [NOTIFY_TO],
+      subject,
+      html: htmlBody,
+      text: textBody,
+    });
+    if (error) console.error("[resend] subscriber-notify error", tier, error);
+  } catch (err) {
+    console.error("[resend] subscriber-notify threw", tier, err);
+  }
+}
+
 async function addToMailerLite(tier: SubmissionTier, email: string) {
   if (!MAILERLITE_API_KEY || !MAILERLITE_GROUP_ID) {
     console.error("[mailerlite] missing MAILERLITE_API_KEY or MAILERLITE_GROUP_ID");
@@ -281,7 +322,10 @@ export async function subscribeLeadMagnet(_prev: FormState, formData: FormData):
     return { status: "error", message: "Please enter a valid email." };
   }
   console.log("[lead_magnet]", { email });
-  await addToMailerLite("lead_magnet", email);
+  await Promise.all([
+    addToMailerLite("lead_magnet", email),
+    notifyNewSubscriber("lead_magnet", email),
+  ]);
   return { status: "ok", message: "Thanks for submitting - check your email!" };
 }
 
@@ -293,6 +337,9 @@ export async function subscribeNewsletter(_prev: FormState, formData: FormData):
     return { status: "error", message: "Please enter a valid email." };
   }
   console.log("[newsletter]", { email });
-  await addToMailerLite("newsletter", email);
+  await Promise.all([
+    addToMailerLite("newsletter", email),
+    notifyNewSubscriber("newsletter", email),
+  ]);
   return { status: "ok", message: "Thanks for submitting - check your email!" };
 }
