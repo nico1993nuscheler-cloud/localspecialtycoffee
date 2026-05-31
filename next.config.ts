@@ -32,19 +32,40 @@ const nextConfig: NextConfig = {
       // in GSC → Pages → "Not found (404)". Pattern:
       //   { source: "/old-webflow-slug", destination: "/cities/new-slug", permanent: true },
 
-      // Retired cafe slug that the smart-fallback in
-      // /specialty-coffee-place/[slug]/page.tsx can't resolve because the
-      // slug has no recognizable city stem at the end. Seven Miles was a
-      // Sydney roaster removed from the shortlist; smart fallback misses
-      // it (no `-sydney` suffix), so route explicitly. Per Wayback diff
-      // (May 31, 2026), this is the only Webflow URL that genuinely needs
-      // a hand-mapped rule — every other slug either still exists or ends
-      // with a city stem the smart fallback already catches.
+      // The four URLs GSC reports as "Nicht gefunden (404)" as of May 31, 2026
+      // — three explicit cafe/legacy redirects below, plus the brewbuddy
+      // subdomain handled separately (see comment at end). Per the Wayback
+      // diff, the migration preserved URL structure almost perfectly; these
+      // are the only leftovers actively bleeding crawl budget.
+
+      // Seven Miles (Sydney roaster) — retired from shortlist. Smart fallback
+      // in /specialty-coffee-place/[slug]/page.tsx can't catch this one
+      // because the slug ends with --roastery, not a city stem.
       {
         source: "/specialty-coffee-place/seven-miles-coffee-roasters--office---roastery",
         destination: "/cities/best-coffee-in-sydney",
         permanent: true,
       },
+      // Cafeletka — Czech cafe (cafeletka.cz). Slug has `.cz` instead of a
+      // city stem, so smart fallback misses it. Was a Prague listing.
+      {
+        source: "/specialty-coffee-place/cafeletka.cz",
+        destination: "/cities/best-coffee-shops-in-prague",
+        permanent: true,
+      },
+      // Webflow legacy: /deletion-basket/* was Webflow's trash-can namespace
+      // for soft-deleted pages. Send any residual hits to the homepage.
+      {
+        source: "/deletion-basket/:path*",
+        destination: "/",
+        permanent: true,
+      },
+      // NOTE: brewbuddy.localspecialtycoffee.com (the fourth 404 in GSC)
+      // is a separate subdomain Vercel doesn't route from this Next.js app,
+      // so a redirect here would never fire. Fix is to add a wildcard
+      // redirect at the DNS / Vercel-domains layer (point the subdomain at
+      // the apex with a 301), or remove it from Vercel/Cloudflare entirely
+      // so Google stops trying to crawl it.
     ];
   },
 };
