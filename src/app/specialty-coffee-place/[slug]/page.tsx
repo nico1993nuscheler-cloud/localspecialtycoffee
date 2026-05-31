@@ -52,9 +52,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const p = await getPlaceBySlug(slug);
   if (!p) return {};
   const year = new Date().getFullYear();
+  // CTR rescue (May 31, 2026 GSC audit): cafe pages were ranking position
+  // 5-10 on branded queries ("el pacho coffee roasters", "hideaway coffee
+  // soho", etc.) but losing the click to the cafe's own site. CTR ~0.25-0.5%.
+  // The old description ended with the generic "A true Specialty Coffee Gem"
+  // filler — replace it with the cafe's actual differentiator (flavour
+  // profile or excerpt) leading the snippet, and add a freshness/proof cue.
+  const desc = p.flavour_profile?.trim() || p.excerpt_short?.trim() || `Specialty coffee in ${p.city.name}.`;
   return {
     title: `${p.name} - ${p.city.name} (${year} Review)`,
-    description: `${p.flavour_profile ?? p.excerpt_short ?? ""}. A true Specialty Coffee Gem in ${p.city.name}. Explore Now.`,
+    description: `${desc} — our ${year} review of ${p.name} in ${p.city.name}, with hours, menu highlights and the local vibe.`,
     alternates: { canonical: `/specialty-coffee-place/${p.slug}` },
     openGraph: {
       title: `${p.name} — ${p.city.name}`,

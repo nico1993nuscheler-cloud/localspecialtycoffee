@@ -23,19 +23,30 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const city = await getCityBySlug(slug);
   if (!city) return {};
-  // Count is the real, current shortlist size — the old "TOP 10" prefix
-  // was misleading when most cities actually ship 13-15 cafés. Mismatched
-  // titles cost CTR and trust signals.
+  // Title-tag CTR optimization (May 31, 2026 GSC audit):
+  // Old format: "Top 9 - <editorial H1> (2026)" → 70-90 chars, gets
+  // truncated in SERPs, and leads with the editorial flair instead of the
+  // search-intent phrase. GSC shows pages at position 7-50 with 0.1-0.4%
+  // CTR — well below the 2-5% expected for those positions.
+  // New format: "Best Specialty Coffee in <City> (<year>): <N> Top Spots"
+  // → 50-60 chars, leads with the high-intent query, ends with a proof
+  // point. The editorial H1 stays on the page (still in <h1>), it just
+  // isn't the SERP title anymore.
   const places = await getPlacesInCity(city.webflow_id);
   const year = new Date().getFullYear();
-  const baseTitle = city.h1 ?? city.name;
   const title =
     places.length > 0
-      ? `Top ${places.length} - ${baseTitle} (${year})`
-      : `${baseTitle} (${year})`;
+      ? `Best Specialty Coffee in ${city.name} (${year}): ${places.length} Top Spots`
+      : `Best Specialty Coffee in ${city.name} (${year})`;
+  // Meta-description fallback (when no hand-written city.meta_description
+  // exists in Supabase) — give the SERP snippet something with specificity
+  // + freshness signals instead of the generic "Discover the best…" line.
+  const descFallback = places.length > 0
+    ? `Hand-picked guide to specialty coffee in ${city.name} (${year}): ${places.length} cafés & roasters, mapped and reviewed by locals.`
+    : `Hand-picked guide to specialty coffee in ${city.name}, mapped and reviewed by locals.`;
   return {
     title,
-    description: city.meta_description ?? `Discover the best specialty coffee in ${city.name}.`,
+    description: city.meta_description ?? descFallback,
     alternates: { canonical: `/cities/${city.slug}` },
     openGraph: {
       title: `${city.h1 ?? city.name}`,
