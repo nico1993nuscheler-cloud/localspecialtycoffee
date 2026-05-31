@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
-import { getAllPlaces, getPlaceBySlug, getPlacesInCity } from "@/lib/data";
+import { getAllCities, getAllPlaces, getPlaceBySlug, getPlacesInCity } from "@/lib/data";
 import { PlaceCard } from "@/components/PlaceCard";
 import { PlaceCTAs } from "@/components/PlaceCTAs";
 import { Gallery } from "@/components/Gallery";
@@ -13,6 +13,37 @@ export const revalidate = 2592000;
 
 export async function generateStaticParams() {
   return (await getAllPlaces()).map((p) => ({ slug: p.slug }));
+}
+
+// Normalize a city name (or any string) to the kebab-case stem cafe slugs use.
+// "Buenos Aires" → "buenos-aires", "São Paulo" → "sao-paulo", "Zurich" → "zurich".
+function normalizeStem(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+// When a cafe slug doesn't resolve (cafe was dropped from a city's shortlist
+// or renamed), try to recover the city from the slug's suffix and redirect
+// there with a 301 instead of dropping a 404. This preserves any organic
+// equity flowing to the old URL.
+async function redirectTargetForMissingPlace(slug: string): Promise<string | null> {
+  const cities = await getAllCities();
+  // Sort by stem length descending so "buenos-aires" wins over "aires" etc.
+  const byStem = cities
+    .map((c) => ({ stem: normalizeStem(c.name), citySlug: c.slug }))
+    .filter((c) => c.stem.length > 0)
+    .sort((a, b) => b.stem.length - a.stem.length);
+  const slugLower = slug.toLowerCase();
+  for (const { stem, citySlug } of byStem) {
+    if (slugLower.endsWith(`-${stem}`) || slugLower === stem) {
+      return `/cities/${citySlug}`;
+    }
+  }
+  return null;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -84,7 +115,11 @@ const FEATURE_GROUPS: { label: string; items: { key: string; label: string }[] }
 export default async function PlacePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const p = await getPlaceBySlug(slug);
-  if (!p) return notFound();
+  if (!p) {
+    const target = await redirectTargetForMissingPlace(slug);
+    if (target) permanentRedirect(target);
+    return notFound();
+  }
 
   const otherPlaces = (await getPlacesInCity(p.city_webflow_id))
     .filter((o) => o.webflow_id !== p.webflow_id)
