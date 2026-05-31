@@ -4,10 +4,12 @@ import type { Metadata } from "next";
 import {
   getAllCategories,
   getAllCities,
+  getAllPlaces,
   getCityBySlug,
   getPlacesInCity,
 } from "@/lib/data";
 import { PlaceFilters } from "@/components/PlaceFilters";
+import { RelatedCitiesBlock } from "@/components/RelatedCitiesBlock";
 import { Gallery } from "@/components/Gallery";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 import { CityFeatureLinks } from "@/components/CityFeatureLinks";
@@ -60,10 +62,28 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const city = await getCityBySlug(slug);
   if (!city) return notFound();
-  const [places, allCategories] = await Promise.all([
+  const [places, allCategories, allCities, allPlaces] = await Promise.all([
     getPlacesInCity(city.webflow_id),
     getAllCategories(),
+    getAllCities(),
+    getAllPlaces(),
   ]);
+
+  // Place counts per sibling city — used by the RelatedCitiesBlock at the
+  // bottom of the page. Built from a single getAllPlaces() instead of N
+  // getPlacesInCity() calls (one per sibling) to keep cold renders cheap.
+  // city_webflow_id → count, then map by city slug.
+  const countByCityWebflowId = new Map<string, number>();
+  for (const p of allPlaces) {
+    countByCityWebflowId.set(
+      p.city_webflow_id,
+      (countByCityWebflowId.get(p.city_webflow_id) ?? 0) + 1,
+    );
+  }
+  const countByCity: Record<string, number> = {};
+  for (const c of allCities) {
+    countByCity[c.slug] = countByCityWebflowId.get(c.webflow_id) ?? 0;
+  }
 
   // CollectionPage wraps the city listing with topical signal: the page is
   // ABOUT the city's coffee scene, not just a list. mainEntity links to the
@@ -103,6 +123,46 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
     ],
   };
 
+  // FAQPage schema — answers the People-Also-Ask questions Google surfaces
+  // for "best coffee in <city>" and "specialty coffee <city>" queries. Each
+  // answer points back to the on-page listing or a top-rated place from
+  // the city's shortlist, so the structured data stays anchored to real
+  // content (not generated filler that risks Helpful-Content flags).
+  const topPick = places[0];
+  const topPickName = topPick?.name;
+  const faqLd = places.length > 0
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: [
+          {
+            "@type": "Question",
+            name: `Where can I find the best specialty coffee in ${city.name}?`,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: `Our hand-picked guide to ${city.name} lists ${places.length} specialty coffee shops and roasters, ranked and reviewed by locals. ${topPickName ? `Standout picks include ${topPickName}.` : ""}`.trim(),
+            },
+          },
+          {
+            "@type": "Question",
+            name: `What makes a coffee shop "specialty" in ${city.name}?`,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: `Specialty coffee shops in ${city.name} typically work with single-origin beans, brew on commercial-grade equipment, and employ trained baristas. The shops on this list meet those criteria — most also roast their own beans or work directly with named roasters.`,
+            },
+          },
+          {
+            "@type": "Question",
+            name: `Where do locals go for coffee in ${city.name}?`,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: `The ${places.length} cafés and roasters on this page are the spots ${city.name} locals actually go to — not tourist coffee. Each one was selected for quality of brew, atmosphere, and consistency.`,
+            },
+          },
+        ],
+      }
+    : null;
+
   return (
     <>
       <script
@@ -113,6 +173,12 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
+      {faqLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
+      )}
 
       {/* Hero */}
       <section className="relative">
@@ -175,6 +241,16 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
       {/* Programmatic-landing internal links — keep crawlers discovering
        *  /cities/[slug]/[feature] from the city hub. */}
       <CityFeatureLinks citySlug={city.slug} cityName={city.name} places={places} />
+
+      {/* Related cities — internal-linking boost. Weighted toward the
+       * "almost on page 1" cities identified in the May 31, 2026 GSC
+       * audit (Rio, Seoul, São Paulo), so link equity flows their way
+       * from every sibling city page. */}
+      <RelatedCitiesBlock
+        currentSlug={city.slug}
+        allCities={allCities}
+        countByCity={countByCity}
+      />
 
       {/* Brewtiful Guide CTA */}
       <div className="py-14">
