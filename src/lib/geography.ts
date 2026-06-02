@@ -56,6 +56,7 @@ const META: Record<string, GeoMeta> = {
   "coffee-rio-de-janeiro": { continent: "South America", country: "Brazil" },
 
   // Asia
+  "specialty-coffee-kyoto-japan": { continent: "Asia", country: "Japan" },
   "specialty-coffee-hong-kong": { continent: "Asia", country: "Hong Kong" },
   "specialty-coffee-taipei-taiwan": { continent: "Asia", country: "Taiwan" },
   "specialty-coffee-dubai": { continent: "Asia", country: "United Arab Emirates" },
