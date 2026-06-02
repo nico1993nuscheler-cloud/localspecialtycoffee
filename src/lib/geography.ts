@@ -58,6 +58,7 @@ const META: Record<string, GeoMeta> = {
   "coffee-rio-de-janeiro": { continent: "South America", country: "Brazil" },
 
   // Asia
+  "specialty-coffee-tel-aviv-israel": { continent: "Asia", country: "Israel" },
   "specialty-coffee-kyoto-japan": { continent: "Asia", country: "Japan" },
   "specialty-coffee-hong-kong": { continent: "Asia", country: "Hong Kong" },
   "specialty-coffee-taipei-taiwan": { continent: "Asia", country: "Taiwan" },
@@ -90,6 +91,7 @@ export function getCityGeo(slug: string): GeoMeta {
 }
 
 const COUNTRY_FLAGS: Record<string, string> = {
+  "Israel": "🇮🇱",
   "Italy": "🇮🇹",
   "Hong Kong": "🇭🇰",
   "Taiwan": "🇹🇼",
