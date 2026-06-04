@@ -43,6 +43,10 @@ export type Place = {
   button_text: string | null;
   rating: string | null;
   address: string | null;
+  // WGS84 coordinates, geocoded via scripts/geocode-places.mjs. Null until
+  // geocoded — map layers must filter these out.
+  latitude: number | null;
+  longitude: number | null;
   hours_weekday: string | null;
   hours_saturday: string | null;
   hours_sunday: string | null;

@@ -9,10 +9,11 @@ import {
 } from "@/lib/data";
 import type { PlaceWithRefs } from "@/lib/types";
 import { HeroCollage } from "@/components/HeroCollage";
-import { CitySearch } from "@/components/CitySearch";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 import { TrendingShuffle } from "@/components/TrendingShuffle";
 import { FeaturedCitiesGrid } from "@/components/FeaturedCitiesGrid";
+import { GlobeSection } from "@/components/GlobeSection";
+import { getCityCenters } from "@/lib/geography";
 
 export const revalidate = 2592000;
 
@@ -49,6 +50,23 @@ export default async function HomePage() {
 
   const citiesWithCounts = citiesWithCountsArr;
 
+  // Globe inputs: curated city centers joined with each city's real name +
+  // place count. Only cities that resolve to a real name are plotted, so a pin
+  // can never fall back to showing a raw slug.
+  const countBySlug: Record<string, number> = {};
+  for (const c of citiesWithCountsArr) countBySlug[c.slug] = c._count;
+  const nameBySlug: Record<string, string> = {};
+  for (const c of cities) nameBySlug[c.slug] = c.name;
+  const globeCities = getCityCenters()
+    .map((c) => ({
+      slug: c.slug,
+      lat: c.lat,
+      lng: c.lng,
+      name: nameBySlug[c.slug],
+      count: countBySlug[c.slug] ?? 0,
+    }))
+    .filter((c): c is { slug: string; lat: number; lng: number; name: string; count: number } => !!c.name);
+
   // Homepage ItemList — give Google an explicit list of the featured cities
   // so the homepage can earn richer SERP treatment (sitelinks, list cards)
   // and so crawl-prioritization picks up new cities faster.
@@ -84,7 +102,7 @@ export default async function HomePage() {
               Hand-picked cafés, roasters, and barista courses — wherever you are.
             </p>
             <Link
-              href="#city-search"
+              href="#explore"
               className="inline-flex items-center gap-2 rounded-full bg-coral-bright text-ink px-7 py-3.5 font-bold hover:bg-coral hover:text-white hover:-translate-y-0.5 transition-all shadow-md hover:shadow-lg"
             >
               Find the best Coffee
@@ -95,18 +113,13 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* City search */}
-      <section className="bg-bg py-16 border-y border-blush">
-        <div className="max-w-6xl mx-auto px-6 text-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold mb-2">
-            The best Specialty Coffee in your city
-          </h2>
-          <p className="text-muted">Pick a city and start exploring.</p>
-        </div>
-        <div className="px-6">
-          <CitySearch cities={cities.map((c) => ({ slug: c.slug, name: c.name }))} />
-        </div>
-      </section>
+      {/* Interactive globe — explore cities in 3D, tap to map a city's scene.
+       *  Includes its own city search, so the standalone search section that
+       *  used to live here was removed (it was redundant). */}
+      <GlobeSection
+        cities={globeCities}
+        citiesForSearch={cities.map((c) => ({ slug: c.slug, name: c.name }))}
+      />
 
       {/* Trending right now — with category chips + reshuffle */}
       {pool.length > 0 && (

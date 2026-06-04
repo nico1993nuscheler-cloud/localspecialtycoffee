@@ -92,6 +92,29 @@
     color: var(--color-coral);
     text-decoration: underline;
   }
+
+  /* MapLibre popup: strip the default chrome so our MapPlacePopup card sits
+   * flush with rounded corners + a soft shadow. */
+  .lsc-map-popup .maplibregl-popup-content {
+    padding: 0;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 10px 30px -8px rgba(26, 26, 26, 0.35);
+  }
+  .lsc-map-popup .maplibregl-popup-close-button {
+    width: 24px;
+    height: 24px;
+    margin: 4px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--color-ink);
+    font-size: 16px;
+    line-height: 1;
+    z-index: 2;
+  }
+  .lsc-map-popup .maplibregl-popup-close-button:hover {
+    background: #ffffff;
+  }
 }
 
 /* Focus styles — accessibility hardening (kept rootless so they win) */

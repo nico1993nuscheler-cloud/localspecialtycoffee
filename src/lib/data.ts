@@ -98,7 +98,7 @@ const loadPlacesLight = unstable_cache(
     const { data, error } = await supabase
       .from("lsc_coffee_places")
       .select(
-        "webflow_id,slug,name,city_id,category_id,excerpt_short,excerpt_long,flavour_profile,button_text,rating,address,hours_weekday,hours_saturday,hours_sunday,thumbnail_v1_url,thumbnail_v2_url,thumbnail_v3_url,featured_image_url,photo_gallery,website,instagram,booking_link,phone,email,is_featured,in_house_roasting,ethical_sourcing,single_origin,award_winning,micro_lots,experimental_styles,hand_brews,batch_brews,espresso_milk_drinks,decaf_options,alt_milk,cold_brew,offers_classes,retail_beans,online_beans,pastry_snacks,lunch_brunch,work_friendly,outdoor_seating,pet_friendly,certified_baristas,ships_internationally,subscription,to_go,byo_cup_loyalty,community_events,created_at",
+        "webflow_id,slug,name,city_id,category_id,excerpt_short,excerpt_long,flavour_profile,button_text,rating,address,latitude,longitude,hours_weekday,hours_saturday,hours_sunday,thumbnail_v1_url,thumbnail_v2_url,thumbnail_v3_url,featured_image_url,photo_gallery,website,instagram,booking_link,phone,email,is_featured,in_house_roasting,ethical_sourcing,single_origin,award_winning,micro_lots,experimental_styles,hand_brews,batch_brews,espresso_milk_drinks,decaf_options,alt_milk,cold_brew,offers_classes,retail_beans,online_beans,pastry_snacks,lunch_brunch,work_friendly,outdoor_seating,pet_friendly,certified_baristas,ships_internationally,subscription,to_go,byo_cup_loyalty,community_events,created_at",
       );
     if (error) throw error;
 

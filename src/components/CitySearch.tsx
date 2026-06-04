@@ -18,7 +18,15 @@ type Item = {
 
 const MAX_SEARCH_RESULTS = 20;
 
-export function CitySearch({ cities }: { cities: Pick<City, "slug" | "name">[] }) {
+export function CitySearch({
+  cities,
+  onSelect,
+}: {
+  cities: Pick<City, "slug" | "name">[];
+  // When provided (e.g. the globe section), selecting a city calls this instead
+  // of navigating to /cities/[slug]. Default behavior (homepage picker) unchanged.
+  onSelect?: (slug: string) => void;
+}) {
   const router = useRouter();
   const [q, setQ] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
@@ -108,7 +116,8 @@ export function CitySearch({ cities }: { cities: Pick<City, "slug" | "name">[] }
       const item = flat[safeActive];
       if (item) {
         e.preventDefault();
-        router.push(`/cities/${item.slug}`);
+        if (onSelect) onSelect(item.slug);
+        else router.push(`/cities/${item.slug}`);
       }
     } else if (e.key === "Escape") {
       setQ("");
@@ -120,20 +129,38 @@ export function CitySearch({ cities }: { cities: Pick<City, "slug" | "name">[] }
       i === safeActive ? "bg-blush" : "hover:bg-blush"
     }`;
 
+  const rowInner = (it: Item) => (
+    <>
+      <span className="text-lg leading-none" aria-hidden>
+        {it.flag}
+      </span>
+      <span className="font-medium">{it.name}</span>
+      <span className="text-sm text-muted ml-auto">{it.country}</span>
+    </>
+  );
+
   const renderRow = (it: Item, idx: number) => (
     <li key={it.slug}>
-      <Link
-        href={`/cities/${it.slug}`}
-        data-row={idx}
-        onMouseEnter={() => setActiveIndex(idx)}
-        className={rowClass(idx)}
-      >
-        <span className="text-lg leading-none" aria-hidden>
-          {it.flag}
-        </span>
-        <span className="font-medium">{it.name}</span>
-        <span className="text-sm text-muted ml-auto">{it.country}</span>
-      </Link>
+      {onSelect ? (
+        <button
+          type="button"
+          data-row={idx}
+          onMouseEnter={() => setActiveIndex(idx)}
+          onClick={() => onSelect(it.slug)}
+          className={`w-full text-left ${rowClass(idx)}`}
+        >
+          {rowInner(it)}
+        </button>
+      ) : (
+        <Link
+          href={`/cities/${it.slug}`}
+          data-row={idx}
+          onMouseEnter={() => setActiveIndex(idx)}
+          className={rowClass(idx)}
+        >
+          {rowInner(it)}
+        </Link>
+      )}
     </li>
   );
 

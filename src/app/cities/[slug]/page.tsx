@@ -13,6 +13,8 @@ import { RelatedCitiesBlock } from "@/components/RelatedCitiesBlock";
 import { Gallery } from "@/components/Gallery";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 import { CityFeatureLinks } from "@/components/CityFeatureLinks";
+import { CityMapLazy } from "@/components/CityMapLazy";
+import { placesToMapPoints } from "@/lib/geo-points";
 
 export const dynamicParams = true;
 export const revalidate = 2592000;
@@ -68,6 +70,8 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
     getAllCities(),
     getAllPlaces(),
   ]);
+
+  const cityMapPoints = placesToMapPoints(places);
 
   // Place counts per sibling city — used by the RelatedCitiesBlock at the
   // bottom of the page. Built from a single getAllPlaces() instead of N
@@ -227,6 +231,19 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
           )}
         </div>
       </section>
+
+      {/* Interactive map of all geocoded places in the city. Only renders once
+       *  at least one place has coordinates (Phase 0 geocoding). */}
+      {cityMapPoints.length > 0 && (
+        <section className="py-8">
+          <div className="max-w-6xl mx-auto px-6">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6">
+              {city.name} on the map
+            </h2>
+            <CityMapLazy points={cityMapPoints} />
+          </div>
+        </section>
+      )}
 
       {/* Place list with filters */}
       <section className="py-8">
