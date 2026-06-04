@@ -359,11 +359,15 @@ async function main() {
     await upsertOne(sb, "lsc_coffee_places", row, opts);
   }
 
-  // ── 5) Geography mapping — append slug → { continent, country } to
-  // src/lib/geography.ts so the /cities filters group the new city
-  // correctly. Hand-curated file; we only insert if the slug is missing,
-  // never overwrite. Requires `country`, `continent`, and `country_flag`
-  // on `pkg.city` — missing fields just log a warning and skip.
+  // ── 5) Geography mapping — append slug → { continent, country, lat, lng }
+  // to src/lib/geography.ts so (a) the /cities filters group the new city,
+  // (b) the homepage globe plots a pin for it, and (c) the per-city map has a
+  // center. Hand-curated file; we only insert if the slug is missing, never
+  // overwrite. Requires `country`, `continent`, `country_flag`, `lat`, `lng`
+  // on `pkg.city`. `lat`/`lng` are the EDITORIAL heart of the city's coffee
+  // scene (the trendy district, not the geographic centroid) — keep downtown.
+  // GeoMeta.lat/lng are REQUIRED by the type, so a missing pair breaks `next
+  // build`; we skip (with a loud warning) rather than write an invalid entry.
   console.log("\n[5/5] Geography mapping (src/lib/geography.ts)");
   await ensureGeographyEntry(pkg.city, opts);
 
@@ -375,6 +379,15 @@ async function main() {
   console.log("\n✓ Done");
   console.log(`  City: ${publicBase}/cities/${city.slug}`);
   console.log(`  Verify: https://www.localspecialtycoffee.com/cities/${city.slug}`);
+
+  // The city now appears on the globe + /cities filters (geography.ts). But its
+  // cafés need coordinates before they show on the per-city map and the
+  // homepage globe overlay. Geocoding is a separate, reviewable step.
+  console.log("\n  ➜ NEXT — geocode this city's cafés so they appear on the maps:");
+  console.log(`      node scripts/geocode-places.mjs --city ${city.slug}`);
+  console.log(`      # review data/geocode-report.md for any flagged matches, then:`);
+  console.log(`      node scripts/apply-geocodes.mjs`);
+  console.log(`      # then re-flush cache (POST /api/revalidate) or redeploy.`);
 }
 
 async function flushVercelCache(opts) {
@@ -414,12 +427,14 @@ async function flushVercelCache(opts) {
 }
 
 async function ensureGeographyEntry(city, opts) {
-  const { slug, country, continent, country_flag: flag } = city;
-  if (!country || !continent) {
+  const { slug, country, continent, country_flag: flag, lat, lng } = city;
+  if (!country || !continent || lat == null || lng == null) {
     console.warn(
-      `    ⚠️  pkg.city missing { country, continent } — skipping geography.ts update.\n` +
-      `        Add these fields to injection-package.json:\n` +
-      `        "country": "Thailand", "continent": "Asia", "country_flag": "🇹🇭"`,
+      `    ⚠️  pkg.city missing { country, continent, lat, lng } — skipping geography.ts update.\n` +
+      `        (lat/lng are REQUIRED — GeoMeta needs them or next build fails, and\n` +
+      `         without them the city won't appear on the globe or get a map center.)\n` +
+      `        Add these fields to injection-package.json city block:\n` +
+      `        "country": "Thailand", "continent": "Asia", "country_flag": "🇹🇭", "lat": 13.7563, "lng": 100.5018`,
     );
     return;
   }
@@ -429,7 +444,7 @@ async function ensureGeographyEntry(city, opts) {
   catch { console.warn(`    ⚠️  could not read ${geoPath} — skipping`); return; }
 
   // 1. META map: insert slug entry if missing
-  const slugLine = `  "${slug}": { continent: "${continent}", country: "${country}" },`;
+  const slugLine = `  "${slug}": { continent: "${continent}", country: "${country}", lat: ${lat}, lng: ${lng} },`;
   if (src.includes(`"${slug}":`)) {
     console.log(`    ✓ META already has ${slug}`);
   } else {
