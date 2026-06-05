@@ -1,4 +1,7 @@
 import type { PlaceWithRefs } from "@/lib/types";
+import { ShareButtons } from "./ShareButtons";
+
+const SITE = "https://www.localspecialtycoffee.com";
 
 function isMapsDirectionsUrl(url: string | null): boolean {
   if (!url) return false;
@@ -58,6 +61,15 @@ export function PlaceCTAs({ place }: { place: PlaceWithRefs }) {
           View on Instagram
         </a>
       )}
+
+      <div className="pt-3 mt-1 border-t border-blush">
+        <ShareButtons
+          url={`${SITE}/specialty-coffee-place/${place.slug}`}
+          title={`☕ ${place.name} — a specialty spot in ${place.city.name} worth crossing the city for:`}
+          campaign={`place_${place.slug}`}
+          label="Send this spot"
+        />
+      </div>
     </div>
   );
 }

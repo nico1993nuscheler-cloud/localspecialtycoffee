@@ -1,8 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getAllCities, getAllPlaces, getAllCategories, getPlacesInCity } from "@/lib/data";
 import { LANDING_FEATURES, MIN_INDEXABLE_LANDING_PLACES } from "@/lib/landing-features";
-
-const BASE = "https://www.localspecialtycoffee.com";
+import { SITE_URL as BASE } from "@/lib/config";
 
 // Build/deploy timestamp — used as lastmod for static pages that have no
 // per-row date in the DB. Captured at module evaluation, so it bumps every
@@ -31,6 +30,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/faqs`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.3 },
     { url: `${BASE}/terms-conditions`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.1 },
     { url: `${BASE}/submissions`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.4 },
+    { url: `${BASE}/map`, lastModified: DEPLOY_TIME, changeFrequency: "weekly", priority: 0.7 },
+    { url: `${BASE}/world-of-coffee-brussels`, lastModified: DEPLOY_TIME, changeFrequency: "weekly", priority: 0.6 },
     { url: `${BASE}/privacy`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.2 },
     { url: `${BASE}/imprint`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.1 },
   ];
@@ -79,6 +80,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
+  // Per-city shareable map pages (/map/[slug]).
+  const mapUrls: MetadataRoute.Sitemap = allCities.map((c) => ({
+    url: `${BASE}/map/${c.slug}`,
+    lastModified: DEPLOY_TIME,
+    changeFrequency: "weekly",
+    priority: 0.6,
+  }));
+
   // Programmatic landing pages: only emit combos with ≥ MIN_PLACES_PER_LANDING
   // matching places. Thin programmatic pages were a primary Helpful-Content
   // demotion vector in the 2025 updates — better to noindex by omission than
@@ -102,5 +111,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  return [...staticPages, ...cityUrls, ...categoryUrls, ...placeUrls, ...landingUrls];
+  return [...staticPages, ...cityUrls, ...categoryUrls, ...placeUrls, ...landingUrls, ...mapUrls];
 }

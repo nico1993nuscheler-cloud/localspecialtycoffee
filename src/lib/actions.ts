@@ -224,7 +224,11 @@ async function notifyNewSubscriber(tier: "newsletter" | "lead_magnet", email: st
   }
 }
 
-async function addToMailerLite(tier: SubmissionTier, email: string) {
+async function addToMailerLite(
+  tier: SubmissionTier,
+  email: string,
+  extraFields?: Record<string, string>,
+) {
   if (!MAILERLITE_API_KEY || !MAILERLITE_GROUP_ID) {
     console.error("[mailerlite] missing MAILERLITE_API_KEY or MAILERLITE_GROUP_ID");
     return;
@@ -240,7 +244,10 @@ async function addToMailerLite(tier: SubmissionTier, email: string) {
       body: JSON.stringify({
         email,
         groups: [MAILERLITE_GROUP_ID],
-        fields: { source: tier },
+        // `city` + `map_url` let the MailerLite automation email link the
+        // right map ({$map_url}) and greet by city ({$city}). Both must exist
+        // as custom fields in MailerLite or they're silently ignored.
+        fields: { source: tier, ...(extraFields ?? {}) },
       }),
     });
     if (!res.ok) {
@@ -321,9 +328,15 @@ export async function subscribeLeadMagnet(_prev: FormState, formData: FormData):
   if (!email || !email.includes("@")) {
     return { status: "error", message: "Please enter a valid email." };
   }
-  console.log("[lead_magnet]", { email });
+  // Optional city context (set on city / WoC pages) → personalizes the map the
+  // automation email delivers. Falls back to the global map when absent.
+  const citySlug = String(formData.get("city_slug") || "").trim();
+  const cityName = String(formData.get("city_name") || "").trim();
+  const SITE = "https://www.localspecialtycoffee.com";
+  const mapUrl = citySlug ? `${SITE}/map/${citySlug}` : `${SITE}/map`;
+  console.log("[lead_magnet]", { email, citySlug, mapUrl });
   await Promise.all([
-    addToMailerLite("lead_magnet", email),
+    addToMailerLite("lead_magnet", email, { city: cityName, map_url: mapUrl }),
     notifyNewSubscriber("lead_magnet", email),
   ]);
   return { status: "ok", message: "Thanks for submitting - check your email!" };

@@ -4,11 +4,12 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CookieConsent } from "@/components/CookieConsent";
 import { BRAND } from "@/lib/brand";
+import { SITE_URL } from "@/lib/config";
 
 const DEFAULT_OG_IMAGE = BRAND.brewtifulMapVisual;
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.localspecialtycoffee.com"),
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "Specialty Coffee Near Me | Find Coffee Shops, Roasters & Beans",
     template: "%s",

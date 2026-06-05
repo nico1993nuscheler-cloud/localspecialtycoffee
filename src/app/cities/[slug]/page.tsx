@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
@@ -14,7 +15,11 @@ import { Gallery } from "@/components/Gallery";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 import { CityFeatureLinks } from "@/components/CityFeatureLinks";
 import { CityMapLazy } from "@/components/CityMapLazy";
+import { ShareButtons } from "@/components/ShareButtons";
+import { SubmitSpotPrompt } from "@/components/SubmitSpotPrompt";
 import { placesToMapPoints } from "@/lib/geo-points";
+
+const SITE = "https://www.localspecialtycoffee.com";
 
 export const dynamicParams = true;
 export const revalidate = 2592000;
@@ -211,6 +216,33 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
         </div>
       </section>
 
+      {/* Share row + (Brussels only) World of Coffee event banner. Placed right
+       *  under the hero — the moment of value, where someone has just landed on
+       *  a curated city guide worth forwarding. */}
+      <section className="pt-6">
+        <div className="max-w-6xl mx-auto px-6 flex flex-col gap-4">
+          <ShareButtons
+            url={`${SITE}/cities/${city.slug}`}
+            title={`☕ ${city.name} specialty coffee crawl — ${places.length} spots worth crossing the city for:`}
+            campaign={`city_${city.slug}`}
+            label="Share this guide"
+          />
+          {city.slug === "best-coffee-in-brussels" && (
+            <Link
+              href="/world-of-coffee-brussels"
+              className="group flex items-center justify-between gap-4 rounded-2xl bg-[#0e1f3a] text-white px-5 py-4 hover:brightness-110 transition"
+            >
+              <span className="text-sm md:text-base font-semibold">
+                ☕ Heading to <strong>World of Coffee Brussels</strong> (Jun 25–27)? Here&apos;s where to drink between sessions →
+              </span>
+              <span className="shrink-0 rounded-full bg-coral-bright text-ink font-bold px-4 py-2 text-sm group-hover:bg-coral group-hover:text-white transition-colors">
+                Open the guide
+              </span>
+            </Link>
+          )}
+        </div>
+      </section>
+
       {/* 2-column: SEO text left, gallery right */}
       <section className="py-14">
         <div className="max-w-6xl mx-auto px-6 grid lg:grid-cols-[1.5fr_1fr] gap-12 items-start">
@@ -269,9 +301,16 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
         countByCity={countByCity}
       />
 
-      {/* Brewtiful Guide CTA */}
+      {/* Contextual UGC prompt — revives the dormant /submissions flow with the
+       *  city pre-filled. */}
+      <div className="py-6">
+        <SubmitSpotPrompt cityName={city.name} />
+      </div>
+
+      {/* Brewtiful Guide CTA — the email-gated Google Maps lead magnet, framed
+       *  around this city. */}
       <div className="py-14">
-        <BrewtifulGuide />
+        <BrewtifulGuide cityName={city.name} citySlug={city.slug} />
       </div>
     </>
   );

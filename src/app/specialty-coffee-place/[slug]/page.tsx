@@ -344,6 +344,18 @@ export default async function PlacePage({ params }: { params: Promise<{ slug: st
         <BrewtifulGuide />
       </div>
 
+      {/* Owner badge prompt — Phase 3 backlink push. Featured cafes get a
+       * copy-pasteable embed badge they can drop into their own site,
+       * generating a real <a href> back to this profile page. */}
+      <section className="py-6">
+        <div className="max-w-6xl mx-auto px-6 text-center text-sm text-muted">
+          Are you the owner?{" "}
+          <Link href={`/badge?slug=${p.slug}`} className="text-coral font-medium hover:underline">
+            Get a badge for your site →
+          </Link>
+        </div>
+      </section>
+
       {/* Other places in city */}
       {otherPlaces.length > 0 && (
         <section className="py-14">

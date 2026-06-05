@@ -9,9 +9,15 @@ const initial: FormState = { status: "idle" };
 export function NewsletterForm({
   tier = "newsletter",
   cta,
+  citySlug,
+  cityName,
 }: {
   tier?: "newsletter" | "lead_magnet";
   cta?: string;
+  /** When set on a lead-magnet form, the signup is tagged to this city so the
+   *  automation email delivers the city-specific map. */
+  citySlug?: string;
+  cityName?: string;
 }) {
   const action = tier === "lead_magnet" ? subscribeLeadMagnet : subscribeNewsletter;
   const [state, formAction, pending] = useActionState(action, initial);
@@ -23,6 +29,12 @@ export function NewsletterForm({
 
   return (
     <form action={formAction} className="flex flex-col gap-3 w-full">
+      {tier === "lead_magnet" && citySlug && (
+        <>
+          <input type="hidden" name="city_slug" value={citySlug} />
+          <input type="hidden" name="city_name" value={cityName ?? ""} />
+        </>
+      )}
       <div className="bg-white p-1 rounded-2xl sm:rounded-full w-full flex flex-col sm:flex-row gap-2 sm:gap-1">
         <input
           name="email"

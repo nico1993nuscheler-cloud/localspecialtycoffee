@@ -11,7 +11,25 @@ import { NewsletterForm } from "@/components/NewsletterForm";
  * `compact` is used on city/cafe pages (smaller, no break-out).
  * Default (no `compact`) is used on home and dedicated CTA placements.
  */
-export function BrewtifulGuide({ compact = false }: { compact?: boolean }) {
+export function BrewtifulGuide({
+  compact = false,
+  cityName,
+  citySlug,
+}: {
+  compact?: boolean;
+  /** When set, the Maps lead-magnet is framed around a single city. */
+  cityName?: string;
+  /** City slug — tags the signup so the email delivers that city's map. */
+  citySlug?: string;
+}) {
+  const heading = cityName
+    ? `Get the ${cityName} coffee map ☕`
+    : "A Brew-tiful Google Maps Specialty Coffee Guide ☕";
+  const blurb = cityName
+    ? `Every specialty spot in ${cityName}, saved to one Google Map you can open on the ground. Free — straight to your inbox.`
+    : "Every spot in our directory, plotted on a single Google Map. Free.";
+  const cta = cityName ? `Get the ${cityName} map` : "Get Access to the Maps";
+
   if (compact) {
     return (
       <section className="max-w-6xl mx-auto px-6">
@@ -27,14 +45,10 @@ export function BrewtifulGuide({ compact = false }: { compact?: boolean }) {
               />
             </div>
             <div>
-              <h3 className="text-2xl md:text-3xl font-bold mb-3">
-                A Brew-tiful Google Maps Specialty Coffee Guide ☕
-              </h3>
-              <p className="text-white/70 mb-5 text-sm">
-                Every spot in our directory, plotted on a single Google Map. Free.
-              </p>
+              <h3 className="text-2xl md:text-3xl font-bold mb-3">{heading}</h3>
+              <p className="text-white/70 mb-5 text-sm">{blurb}</p>
               <div className="max-w-md">
-                <NewsletterForm tier="lead_magnet" cta="Get Access to the Maps" />
+                <NewsletterForm tier="lead_magnet" cta={cta} citySlug={citySlug} cityName={cityName} />
               </div>
             </div>
           </div>
@@ -56,16 +70,31 @@ export function BrewtifulGuide({ compact = false }: { compact?: boolean }) {
           {/* Text + form (left on desktop) */}
           <div className="order-2 md:order-1 max-w-xl">
             <h2 className="text-[26px] sm:text-3xl md:text-5xl font-bold leading-[1.15] md:leading-[1.1] mb-5">
-              A Brew-tiful Google Maps Specialty Coffee Guide! ☕
+              {cityName ? `Get the ${cityName} coffee map! ☕` : "A Brew-tiful Google Maps Specialty Coffee Guide! ☕"}
             </h2>
             <p className="text-white/80 text-base md:text-lg mb-6">
-              London, Copenhagen, New York, Bangkok, Hamburg, …! 🔍☕ We&apos;ve
-              mapped out the best Specialty Coffee Shops and Coffee Roasters,
-              so you can explore every city&apos;s unique coffee scene — directly
-              in Google Maps.
+              {cityName ? (
+                <>
+                  Every specialty spot we&apos;ve hand-picked in {cityName}, saved
+                  to one Google Map. 🔍☕ Open it on your phone and crawl the whole
+                  scene — no screenshots, no lost notes.
+                </>
+              ) : (
+                <>
+                  London, Copenhagen, New York, Bangkok, Hamburg, …! 🔍☕ We&apos;ve
+                  mapped out the best Specialty Coffee Shops and Coffee Roasters,
+                  so you can explore every city&apos;s unique coffee scene — directly
+                  in Google Maps.
+                </>
+              )}
             </p>
             <div className="max-w-md">
-              <NewsletterForm tier="lead_magnet" cta="Get access to the Maps" />
+              <NewsletterForm
+                tier="lead_magnet"
+                cta={cityName ? `Get the ${cityName} map` : "Get access to the Maps"}
+                citySlug={citySlug}
+                cityName={cityName}
+              />
             </div>
             <p className="mt-4 text-xs text-white/50">
               Free. No spam. Unsubscribe with one click.

@@ -57,7 +57,7 @@ function CommonFields() {
   );
 }
 
-export function SubmissionFormFree() {
+export function SubmissionFormFree({ defaultCity }: { defaultCity?: string }) {
   const [state, formAction, pending] = useActionState(submitFree, initial);
   if (state.status === "ok") {
     return (
@@ -69,6 +69,7 @@ export function SubmissionFormFree() {
   return (
     <form action={formAction} className="grid gap-4 bg-white rounded-2xl border border-blush p-6">
       <h3 className="text-xl font-semibold">Free listing</h3>
+      {defaultCity && <input type="hidden" name="city" value={defaultCity} />}
       <CommonFields />
       <Turnstile />
       {state.status === "error" && <p className="text-sm text-coral">{state.message}</p>}
@@ -79,7 +80,7 @@ export function SubmissionFormFree() {
   );
 }
 
-export function SubmissionFormPremium() {
+export function SubmissionFormPremium({ defaultCity }: { defaultCity?: string }) {
   const [state, formAction, pending] = useActionState(submitPremium, initial);
   if (state.status === "ok") {
     return (
@@ -92,6 +93,7 @@ export function SubmissionFormPremium() {
     <form action={formAction} className="grid gap-4 bg-coral-50 rounded-2xl border border-coral p-6">
       <h3 className="text-xl font-semibold">Premium listing</h3>
       <p className="text-sm text-muted">Featured placement, gallery, booking link, priority review.</p>
+      {defaultCity && <input type="hidden" name="city" value={defaultCity} />}
       <CommonFields />
       <label className="block">
         <span className="text-sm font-medium">Booking link</span>
