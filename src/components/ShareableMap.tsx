@@ -26,8 +26,12 @@ export function ShareableMap({
   slug: string;
   fullGuideHref?: string;
 }) {
-  const routeUrl = googleMapsRouteUrl(points);
-  const overCap = points.length > MAPS_ROUTE_CAP;
+  // A walking route only makes sense within a single city — across the global
+  // map the first 10 points span continents (Dubai → Taipei → …), so a route
+  // is meaningless there. Per-city: show it; global: browse + KML instead.
+  const isCity = slug !== "all";
+  const routeUrl = isCity ? googleMapsRouteUrl(points) : null;
+  const overCap = isCity && points.length > MAPS_ROUTE_CAP;
   const pagePath = slug === "all" ? "/map" : `/map/${slug}`;
 
   return (
