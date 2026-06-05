@@ -1,10 +1,10 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { City } from "@/lib/types";
 import { ALL_CONTINENTS, getCityGeo, type Continent } from "@/lib/geography";
+import { CityDiscoveryCard } from "./CityDiscoveryCard";
 
 type CityWithCount = City & { _count: number };
 
@@ -56,32 +56,16 @@ export function FeaturedCitiesGrid({ cities }: { cities: CityWithCount[] }) {
           <Link href="/cities" className="text-coral underline">Browse all cities</Link>
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {visible.map((city) => (
-            <Link
+            <CityDiscoveryCard
               key={city.webflow_id}
-              href={`/cities/${city.slug}`}
-              className="group rounded-2xl overflow-hidden bg-white border border-blush hover:border-coral hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
-            >
-              <div className="aspect-[1080/680] bg-blush relative">
-                {city.thumbnail_v2_url && (
-                  <Image
-                    src={city.thumbnail_v2_url}
-                    alt={`Specialty coffee in ${city.name}`}
-                    fill
-                    sizes="(max-width: 768px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                )}
-              </div>
-              <div className="p-5">
-                <h3 className="font-bold text-xl mb-1">{city.name}</h3>
-                {city.excerpt_short && (
-                  <p className="text-sm text-muted line-clamp-2">{city.excerpt_short}</p>
-                )}
-                <p className="text-xs text-coral mt-3 font-semibold">{city._count} spots →</p>
-              </div>
-            </Link>
+              slug={city.slug}
+              name={city.name}
+              count={city._count}
+              imageUrl={city.thumbnail_v2_url}
+              excerpt={city.excerpt_short}
+            />
           ))}
         </div>
       )}

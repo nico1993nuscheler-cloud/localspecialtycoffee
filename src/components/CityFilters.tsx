@@ -1,10 +1,9 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { City } from "@/lib/types";
 import { ALL_CONTINENTS, getCityGeo, type Continent } from "@/lib/geography";
+import { CityDiscoveryCard } from "./CityDiscoveryCard";
 
 type CityWithCount = City & { _count: number };
 
@@ -134,36 +133,17 @@ export function CityFilters({ cities }: { cities: CityWithCount[] }) {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filtered.map((city) => {
-            const geo = getCityGeo(city.slug);
-            return (
-              <Link
-                key={city.webflow_id}
-                href={`/cities/${city.slug}`}
-                className="group rounded-2xl overflow-hidden bg-white border border-blush hover:border-coral hover:shadow-md transition-all"
-              >
-                <div className="aspect-[568/680] bg-blush relative">
-                  {city.thumbnail_v1_url && (
-                    <Image
-                      src={city.thumbnail_v1_url}
-                      alt={`Specialty coffee in ${city.name}`}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 33vw, 25vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  )}
-                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-ink">
-                    {geo.country}
-                  </div>
-                </div>
-                <div className="p-4">
-                  <h2 className="font-bold text-lg">{city.name}</h2>
-                  <p className="text-xs text-coral font-semibold mt-1">{city._count} spots</p>
-                </div>
-              </Link>
-            );
-          })}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filtered.map((city) => (
+            <CityDiscoveryCard
+              key={city.webflow_id}
+              slug={city.slug}
+              name={city.name}
+              count={city._count}
+              imageUrl={city.thumbnail_v1_url}
+              excerpt={city.excerpt_short}
+            />
+          ))}
         </div>
       )}
     </>
