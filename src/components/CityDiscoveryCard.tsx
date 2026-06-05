@@ -35,7 +35,7 @@ export function CityDiscoveryCard({
           />
         )}
         <span className="absolute bottom-3 left-3 rounded-full bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-ink shadow-sm backdrop-blur-sm">
-          {count} spots · mapped
+          {count} spots · {name}
         </span>
       </Link>
 
