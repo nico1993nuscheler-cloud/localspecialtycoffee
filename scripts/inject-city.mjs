@@ -377,13 +377,17 @@ async function main() {
   await flushVercelCache(opts);
 
   console.log("\n✓ Done");
-  console.log(`  City: ${publicBase}/cities/${city.slug}`);
-  console.log(`  Verify: https://www.localspecialtycoffee.com/cities/${city.slug}`);
+  console.log(`  City:      ${publicBase}/cities/${city.slug}`);
+  console.log(`  Map page:  ${publicBase}/map/${city.slug}`);
+  console.log(`  Verify:    /cities/${city.slug} (share row) · /map/${city.slug} (pins + Google Maps buttons) · discovery card on / and /cities`);
 
   // The city now appears on the globe + /cities filters (geography.ts). But its
-  // cafés need coordinates before they show on the per-city map and the
-  // homepage globe overlay. Geocoding is a separate, reviewable step.
-  console.log("\n  ➜ NEXT — geocode this city's cafés so they appear on the maps:");
+  // cafés need coordinates before they show on ANY map surface — the per-city
+  // map, the homepage globe overlay, the dedicated /map/<slug> page, the
+  // discovery-card "Open the map" CTA, and the lead-magnet email link all read
+  // lat/lng. Geocoding is a separate, reviewable step — don't skip it or the
+  // city launches with empty maps + a dead discovery-card CTA.
+  console.log("\n  ➜ NEXT — geocode this city's cafés so they appear on ALL the maps:");
   console.log(`      node scripts/geocode-places.mjs --city ${city.slug}`);
   console.log(`      # review data/geocode-report.md for any flagged matches, then:`);
   console.log(`      node scripts/apply-geocodes.mjs`);
