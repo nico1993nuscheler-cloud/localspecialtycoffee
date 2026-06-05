@@ -69,6 +69,7 @@ const META: Record<string, GeoMeta> = {
   "coffee-rio-de-janeiro": { continent: "South America", country: "Brazil", lat: -22.9068, lng: -43.1729 },
 
   // Asia
+  "specialty-coffee-mumbai": { continent: "Asia", country: "India", lat: 19.0596, lng: 72.8295 },
   "specialty-coffee-bali": { continent: "Asia", country: "Indonesia", lat: -8.6478, lng: 115.1385 },
   "specialty-coffee-tel-aviv-israel": { continent: "Asia", country: "Israel", lat: 32.0853, lng: 34.7818 },
   "specialty-coffee-kyoto-japan": { continent: "Asia", country: "Japan", lat: 35.0116, lng: 135.7681 },
@@ -134,6 +135,7 @@ export function getCityCenters(): CityCenter[] {
 }
 
 const COUNTRY_FLAGS: Record<string, string> = {
+  "India": "🇮🇳",
   "Indonesia": "🇮🇩",
   "Poland": "🇵🇱",
   "Israel": "🇮🇱",

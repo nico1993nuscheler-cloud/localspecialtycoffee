@@ -4300,6 +4300,86 @@
     "confidence": "ok"
   },
   {
+    "webflow_id": "lsc-araku-mumbai",
+    "slug": "araku-mumbai",
+    "name": "Araku Coffee",
+    "city": "Mumbai",
+    "lat": 18.9221547,
+    "lng": 72.83248770000002,
+    "resolvedAddress": "Sunny House, Mandlik Rd, Apollo Bandar, Colaba, Mumbai, Maharashtra 400001, India",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-bombay-island-mumbai",
+    "slug": "bombay-island-mumbai",
+    "name": "Bombay Island Coffee Roasters",
+    "city": "Mumbai",
+    "lat": 19.0931492,
+    "lng": 72.9202404,
+    "resolvedAddress": "Shop #4, Tower C, Retail Street, The Trees, GODREJ ONE, Pirojshanagar, Vikhroli East, Mumbai, Maharashtra 400079, India",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-grey-soul-mumbai",
+    "slug": "grey-soul-mumbai",
+    "name": "Grey Soul Coffee Roasters",
+    "city": "Mumbai",
+    "lat": 19.0648058,
+    "lng": 72.82991129999999,
+    "resolvedAddress": "Dr Ambedkar Rd, next to Wellness Forever, opp. Zig Zag Road, Pali Village, Bandra West, Mumbai, Maharashtra 400050, India",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-kalopsia-mumbai",
+    "slug": "kalopsia-mumbai",
+    "name": "Kalopsia Artisan Coffee",
+    "city": "Mumbai",
+    "lat": 19.050513799999997,
+    "lng": 72.8267533,
+    "resolvedAddress": "SHOP NO.5, PEARL HEAVEN SOCIETY, Chapel Rd, opp. SALT WATER CAFE, St Sebastian Colony, NR LILAVATI, Bandra West, W, Mumbai, Maharashtra 400050, India",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-kc-roasters-mumbai",
+    "slug": "kc-roasters-mumbai",
+    "name": "KC Roasters by Koinonia",
+    "city": "Mumbai",
+    "lat": 19.073313,
+    "lng": 72.8262472,
+    "resolvedAddress": "No. 66, Chuim Village Rd, Khar, Chuim Village, Ram Krishna Nagar, Khar West, Mumbai, Maharashtra 400052, India",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-nandan-mumbai",
+    "slug": "nandan-mumbai",
+    "name": "Nandan Coffee",
+    "city": "Mumbai",
+    "lat": 18.9315328,
+    "lng": 72.83193179999999,
+    "resolvedAddress": "Mulla House, 34, Homi Modi St, opposite Central Bank Head Office, Kala Ghoda, Fort, Mumbai, Maharashtra 400001, India",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-subko-mumbai",
+    "slug": "subko-mumbai",
+    "name": "Subko Coffee",
+    "city": "Mumbai",
+    "lat": 19.0531629,
+    "lng": 72.83001999999999,
+    "resolvedAddress": "Ground Floor, Mary Lodge, 21A, Chapel Rd, next to Saba Heritage building, Ranwar, Bandra West, Mumbai, Maharashtra 400050, India",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-toise-mumbai",
+    "slug": "toise-mumbai",
+    "name": "Toise",
+    "city": "Mumbai",
+    "lat": 19.0125475,
+    "lng": 72.8216988,
+    "resolvedAddress": "Shop No.1, MADHU HANS, Dr Annie Besant Rd, Adarsh Nagar, Worli, Mumbai, Maharashtra 400030, India",
+    "confidence": "ok"
+  },
+  {
     "webflow_id": "6802aa90c9ca8e49fd670cbf",
     "slug": "a-little-lost",
     "name": "A Little Lost",
