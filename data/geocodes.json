@@ -480,6 +480,136 @@
     "confidence": "ok"
   },
   {
+    "webflow_id": "lsc-blacklist-bali",
+    "slug": "blacklist-bali",
+    "name": "Blacklist Coffee Roasters",
+    "city": "Bali",
+    "lat": -8.650606699999999,
+    "lng": 115.1343244,
+    "resolvedAddress": "Jl. Tanah Barak No.6, Canggu, Kec. Kuta Utara, Kabupaten Badung, Bali 80351, Indonesia",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-coffee-cartel-bali",
+    "slug": "coffee-cartel-bali",
+    "name": "Coffee Cartel",
+    "city": "Bali",
+    "lat": -8.676359699999999,
+    "lng": 115.15814019999998,
+    "resolvedAddress": "Jl. Lebak Sari No.8, Kerobokan Kelod, Kec. Kuta Utara, Kabupaten Badung, Bali 80361, Indonesia",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-expat-roasters-bali",
+    "slug": "expat-roasters-bali",
+    "name": "Expat Roasters",
+    "city": "Bali",
+    "lat": -8.6720975,
+    "lng": 115.1606826,
+    "resolvedAddress": "Jl. Petitenget No.1a, Kerobokan Kelod, Kec. Kuta Utara, Kabupaten Badung, Bali 80361, Indonesia",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-house-of-yoreh-bali",
+    "slug": "house-of-yoreh-bali",
+    "name": "House of Yoreh",
+    "city": "Bali",
+    "lat": -8.6297218,
+    "lng": 115.1511289,
+    "resolvedAddress": "Jl. Raya Babakan Canggu No.26, Canggu, Kec. Kuta Utara, Kabupaten Badung, Bali 80361, Indonesia",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-hungry-bird-bali",
+    "slug": "hungry-bird-bali",
+    "name": "Hungry Bird Coffee Roaster",
+    "city": "Bali",
+    "lat": -8.655999600000001,
+    "lng": 115.1410649,
+    "resolvedAddress": "Jl. Raya Semat No.86, Tibubeneng, Kec. Kuta Utara, Kabupaten Badung, Bali 80361, Indonesia",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-missibu-bali",
+    "slug": "missibu-bali",
+    "name": "Missibu Roaster",
+    "city": "Bali",
+    "lat": -8.6647911,
+    "lng": 115.1423034,
+    "resolvedAddress": "tamora shop & apartment, Gg. Sri Kahyangan, Tibubeneng, Kec. Kuta Utara, Kabupaten Badung, Bali 80361, Indonesia",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-revolver-bali",
+    "slug": "revolver-bali",
+    "name": "Revolver Espresso",
+    "city": "Bali",
+    "lat": -8.6843706,
+    "lng": 115.1579758,
+    "resolvedAddress": "Jl. Kayu Aya No.51, Seminyak, Kec. Kuta Utara, Kabupaten Badung, Bali 80361, Indonesia",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-satu-satu-bali",
+    "slug": "satu-satu-bali",
+    "name": "Satu-Satu Coffee Company",
+    "city": "Bali",
+    "lat": -8.6558639,
+    "lng": 115.14752220000001,
+    "resolvedAddress": "Jl. Pantai Berawa No.36, Tibubeneng, Kec. Kuta Utara, Kabupaten Badung, Bali 80361, Indonesia",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-seniman-bali",
+    "slug": "seniman-bali",
+    "name": "Seniman Coffee Studio",
+    "city": "Bali",
+    "lat": -8.5067234,
+    "lng": 115.26515479999999,
+    "resolvedAddress": "Jl. Sri Wedari No.5, Ubud, Kecamatan Ubud, Kabupaten Gianyar, Bali 80571, Indonesia",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-simply-brew-bali",
+    "slug": "simply-brew-bali",
+    "name": "Simply Brew Coffee Roasters",
+    "city": "Bali",
+    "lat": -8.6845078,
+    "lng": 115.2591825,
+    "resolvedAddress": "Jl. Bypass Ngurah Rai No.127A, Semawang, Sanur, Denpasar Selatan, Kota Denpasar, Bali 80228, Indonesia",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-suka-espresso-bali",
+    "slug": "suka-espresso-bali",
+    "name": "Suka Espresso",
+    "city": "Bali",
+    "lat": -8.81635,
+    "lng": 115.0960262,
+    "resolvedAddress": "Jl. Labuansait No.10, Pecatu, Kec. Kuta Sel., Kabupaten Badung, Bali 80361, Indonesia",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-the-koop-bali",
+    "slug": "the-koop-bali",
+    "name": "The Koop Roaster & Cafe",
+    "city": "Bali",
+    "lat": -8.6896006,
+    "lng": 115.1653793,
+    "resolvedAddress": "Jl. Drupadi No.66, Seminyak, Kec. Kuta, Kabupaten Badung, Bali 80361, Indonesia",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-ubud-coffee-roastery-bali",
+    "slug": "ubud-coffee-roastery-bali",
+    "name": "Ubud Coffee Roastery",
+    "city": "Bali",
+    "lat": -8.5117885,
+    "lng": 115.263877,
+    "resolvedAddress": "F7Q7+7J9, Jl. Goutama Sel. No.27x, Ubud, Kecamatan Ubud, Kabupaten Gianyar, Bali 80571, Indonesia",
+    "confidence": "ok"
+  },
+  {
     "webflow_id": "lsc-ceresia-coffee-roasters-bangkok",
     "slug": "ceresia-coffee-roasters-bangkok",
     "name": "Ceresia Coffee Roasters",
