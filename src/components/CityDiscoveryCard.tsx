@@ -3,11 +3,11 @@ import Link from "next/link";
 
 /**
  * Clean discovery card (design "C"). One per city — used on the homepage
- * "Featured cities" section and the /cities index. Two distinct CTAs:
- *   - "Open the map" → the city's live map (/map/[slug])
- *   - "Read the guide" → the written city guide (/cities/[slug])
- * so the card can't be a single wrapping <Link>. Pure presentational; safe to
- * render inside the client filter grids.
+ * "Featured cities" section and the /cities index. The PRIMARY destination is
+ * the written city guide (/cities/[slug]) — the image, the headline, and the
+ * primary button all lead there. The live map (/map/[slug]) is the SECONDARY
+ * action (outline button). Two links means the card can't be a single wrapping
+ * <Link>. Pure presentational; safe to render inside the client filter grids.
  */
 export function CityDiscoveryCard({
   slug,
@@ -24,7 +24,7 @@ export function CityDiscoveryCard({
 }) {
   return (
     <div className="group flex flex-col overflow-hidden rounded-2xl border border-blush bg-white transition-all hover:border-coral hover:shadow-md">
-      <Link href={`/map/${slug}`} className="relative block aspect-[16/10] bg-blush" aria-label={`Open the ${name} coffee map`}>
+      <Link href={`/cities/${slug}`} className="relative block aspect-[16/10] bg-blush" aria-label={`Read the ${name} specialty coffee guide`}>
         {imageUrl && (
           <Image
             src={imageUrl}
@@ -41,22 +41,24 @@ export function CityDiscoveryCard({
 
       <div className="flex flex-1 flex-col p-5">
         <h3 className="text-lg font-bold leading-snug">
-          Find the best Specialty Coffee places in {name}
+          <Link href={`/cities/${slug}`} className="transition-colors hover:text-coral">
+            Find the best Specialty Coffee places in {name}
+          </Link>
         </h3>
         {excerpt && <p className="mt-1.5 line-clamp-2 text-sm text-muted">{excerpt}</p>}
 
         <div className="mt-4 flex flex-wrap gap-2 pt-1">
           <Link
-            href={`/map/${slug}`}
+            href={`/cities/${slug}`}
             className="inline-flex items-center gap-1.5 rounded-full bg-coral-bright px-4 py-2 text-sm font-bold text-ink transition-colors hover:bg-coral hover:text-white"
           >
-            Open the map <span aria-hidden>→</span>
+            Read the guide <span aria-hidden>→</span>
           </Link>
           <Link
-            href={`/cities/${slug}`}
+            href={`/map/${slug}`}
             className="inline-flex items-center rounded-full border-2 border-ink px-4 py-2 text-sm font-semibold text-ink transition-colors hover:bg-ink hover:text-white"
           >
-            Read the guide
+            Open the map
           </Link>
         </div>
       </div>
