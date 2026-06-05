@@ -18,6 +18,7 @@ export function ShareableMap({
   subtitle,
   slug,
   fullGuideHref,
+  seoBody,
 }: {
   points: MapPoint[];
   title: string;
@@ -25,6 +26,9 @@ export function ShareableMap({
   /** identifies the KML endpoint + share campaign; "all" for the global map. */
   slug: string;
   fullGuideHref?: string;
+  /** Unique, data-driven prose under the map — gives the page real content
+   *  (not a thin map shell) and a distinct map/navigation intent vs the guide. */
+  seoBody?: string;
 }) {
   // A walking route only makes sense within a single city — across the global
   // map the first 10 points span continents (Dubai → Taipei → …), so a route
@@ -75,6 +79,10 @@ export function ShareableMap({
         )}
 
         <CityMapLazy points={points} className="h-[72vh] min-h-[420px] w-full rounded-3xl border border-blush" />
+
+        {seoBody && (
+          <p className="mt-6 max-w-3xl text-base leading-relaxed text-muted">{seoBody}</p>
+        )}
 
         <div className="mt-5 flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
           <ShareButtons

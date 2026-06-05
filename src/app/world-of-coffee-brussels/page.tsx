@@ -71,9 +71,20 @@ export default async function WorldOfCoffeeBrusselsPage() {
     url: `${SITE}${PATH}`,
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/` },
+      { "@type": "ListItem", position: 2, name: "Brussels guide", item: `${SITE}/cities/${city.slug}` },
+      { "@type": "ListItem", position: 3, name: "World of Coffee Brussels", item: `${SITE}${PATH}` },
+    ],
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(eventLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }} />
 
       {/* Hero */}
       <section className="relative">

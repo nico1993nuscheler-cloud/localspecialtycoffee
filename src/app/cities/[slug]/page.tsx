@@ -273,6 +273,12 @@ export default async function CityPage({ params }: { params: Promise<{ slug: str
               {city.name} on the map
             </h2>
             <CityMapLazy points={cityMapPoints} />
+            <Link
+              href={`/map/${city.slug}`}
+              className="mt-4 inline-flex items-center gap-1.5 font-semibold text-coral hover:underline"
+            >
+              Open the full {city.name} coffee map <span aria-hidden>→</span>
+            </Link>
           </div>
         </section>
       )}
