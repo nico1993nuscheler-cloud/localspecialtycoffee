@@ -1160,6 +1160,86 @@
     "confidence": "ok"
   },
   {
+    "webflow_id": "lsc-barismo-boston",
+    "slug": "barismo-boston",
+    "name": "Barismo",
+    "city": "Boston",
+    "lat": 42.4053208,
+    "lng": -71.14145610000001,
+    "resolvedAddress": "171 Massachusetts Ave, Arlington, MA 02474, USA",
+    "confidence": "city-mismatch"
+  },
+  {
+    "webflow_id": "lsc-broadsheet-coffee-boston",
+    "slug": "broadsheet-coffee-boston",
+    "name": "Broadsheet Coffee Roasters",
+    "city": "Boston",
+    "lat": 42.377941799999995,
+    "lng": -71.10726799999999,
+    "resolvedAddress": "100 Kirkland St, Cambridge, MA 02138, USA",
+    "confidence": "city-mismatch"
+  },
+  {
+    "webflow_id": "lsc-flat-black-coffee-boston",
+    "slug": "flat-black-coffee-boston",
+    "name": "Flat Black Coffee",
+    "city": "Boston",
+    "lat": 42.272397,
+    "lng": -71.0683816,
+    "resolvedAddress": "1170 Washington St, Dorchester Center, MA 02124, USA",
+    "confidence": "city-mismatch"
+  },
+  {
+    "webflow_id": "lsc-george-howell-coffee-boston",
+    "slug": "george-howell-coffee-boston",
+    "name": "George Howell Coffee",
+    "city": "Boston",
+    "lat": 42.354785899999996,
+    "lng": -71.06147,
+    "resolvedAddress": "505 Washington St, Boston, MA 02111, USA",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-gracenote-coffee-boston",
+    "slug": "gracenote-coffee-boston",
+    "name": "Gracenote Coffee",
+    "city": "Boston",
+    "lat": 42.351507999999995,
+    "lng": -71.05806199999999,
+    "resolvedAddress": "108 Lincoln St, Boston, MA 02111, USA",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-little-wolf-coffee-boston",
+    "slug": "little-wolf-coffee-boston",
+    "name": "Little Wolf Coffee",
+    "city": "Boston",
+    "lat": 42.352532,
+    "lng": -71.0484675,
+    "resolvedAddress": "51 Sleeper St, Boston, MA 02210, USA",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-ogawa-coffee-boston",
+    "slug": "ogawa-coffee-boston",
+    "name": "Ogawa Coffee",
+    "city": "Boston",
+    "lat": 42.3568114,
+    "lng": -71.058072,
+    "resolvedAddress": "10 Milk St, Boston, MA 02108, USA",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-recreo-coffee-boston",
+    "slug": "recreo-coffee-boston",
+    "name": "Recreo Coffee & Roasterie",
+    "city": "Boston",
+    "lat": 42.2858004,
+    "lng": -71.1554378,
+    "resolvedAddress": "1876 Centre St, West Roxbury, MA 02132, USA",
+    "confidence": "city-mismatch"
+  },
+  {
     "webflow_id": "68e914934124f9f9da56a9e0",
     "slug": "belga-co-brussels",
     "name": "Belga & Co",
@@ -2197,6 +2277,96 @@
     "lat": 53.339532,
     "lng": -6.3205146999999995,
     "resolvedAddress": "205B Emmet Rd, Inchicore, Dublin 8, D08 EN29, Ireland",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-artisan-roast-edinburgh",
+    "slug": "artisan-roast-edinburgh",
+    "name": "Artisan Roast",
+    "city": "Edinburgh",
+    "lat": 55.957931699999996,
+    "lng": -3.1888546,
+    "resolvedAddress": "57 Broughton St, Edinburgh EH1 3RJ, UK",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-cairngorm-coffee-edinburgh",
+    "slug": "cairngorm-coffee-edinburgh",
+    "name": "Cairngorm Coffee",
+    "city": "Edinburgh",
+    "lat": 55.9534423,
+    "lng": -3.2003258999999997,
+    "resolvedAddress": "41A Frederick St, Edinburgh EH2 1EP, UK",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-cult-espresso-edinburgh",
+    "slug": "cult-espresso-edinburgh",
+    "name": "Cult Espresso",
+    "city": "Edinburgh",
+    "lat": 55.9415051,
+    "lng": -3.1837136999999998,
+    "resolvedAddress": "104 Buccleuch St, Edinburgh EH8 9NG, UK",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-fortitude-coffee-edinburgh",
+    "slug": "fortitude-coffee-edinburgh",
+    "name": "Fortitude Coffee",
+    "city": "Edinburgh",
+    "lat": 55.955756400000006,
+    "lng": -3.1924899,
+    "resolvedAddress": "3c York Pl, Edinburgh EH1 3EB, UK",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-lowdown-edinburgh",
+    "slug": "lowdown-edinburgh",
+    "name": "Lowdown",
+    "city": "Edinburgh",
+    "lat": 55.9532418,
+    "lng": -3.1979351,
+    "resolvedAddress": "40 George St, Edinburgh EH2 2LE, UK",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-machina-coffee-edinburgh",
+    "slug": "machina-coffee-edinburgh",
+    "name": "Machina Coffee",
+    "city": "Edinburgh",
+    "lat": 55.938164199999996,
+    "lng": -3.1950418999999997,
+    "resolvedAddress": "38 Marchmont Rd, Edinburgh EH9 1HX, UK",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-modern-standard-coffee-edinburgh",
+    "slug": "modern-standard-coffee-edinburgh",
+    "name": "Modern Standard Coffee",
+    "city": "Edinburgh",
+    "lat": 55.9396717,
+    "lng": -3.2043869999999997,
+    "resolvedAddress": "49 Barclay Pl, Edinburgh EH10 4HW, UK",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-origin-coffee-edinburgh",
+    "slug": "origin-coffee-edinburgh",
+    "name": "Origin Coffee",
+    "city": "Edinburgh",
+    "lat": 55.947018899999996,
+    "lng": -3.1866166000000002,
+    "resolvedAddress": "6-8 S College St, Edinburgh EH8 9AA, UK",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-williams-and-johnson-edinburgh",
+    "slug": "williams-and-johnson-edinburgh",
+    "name": "Williams & Johnson Coffee Co",
+    "city": "Edinburgh",
+    "lat": 55.9768422,
+    "lng": -3.1705056,
+    "resolvedAddress": "CUSTOM LANE, 1 Customs Wharf, Leith, Edinburgh EH6 6AL, UK",
     "confidence": "ok"
   },
   {

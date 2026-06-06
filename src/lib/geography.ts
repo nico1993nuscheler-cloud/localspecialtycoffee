@@ -24,6 +24,7 @@ export type GeoMeta = {
 
 const META: Record<string, GeoMeta> = {
   // Europe
+  "specialty-coffee-edinburgh": { continent: "Europe", country: "United Kingdom", lat: 55.9533, lng: -3.1883 },
   "specialty-coffee-warsaw": { continent: "Europe", country: "Poland", lat: 52.2297, lng: 21.0122 },
   "specialty-coffee-milan-italy": { continent: "Europe", country: "Italy", lat: 45.4642, lng: 9.19 },
   "specialty-coffee-dublin": { continent: "Europe", country: "Ireland", lat: 53.3498, lng: -6.2603 },
@@ -49,6 +50,7 @@ const META: Record<string, GeoMeta> = {
   "specialty-coffee-zurich": { continent: "Europe", country: "Switzerland", lat: 47.3769, lng: 8.5417 },
 
   // North America
+  "best-coffee-in-boston": { continent: "North America", country: "United States", lat: 42.3559, lng: -71.0601 },
   "best-coffee-in-austin": { continent: "North America", country: "United States", lat: 30.2672, lng: -97.7431 },
   "best-coffee-in-chicago": { continent: "North America", country: "United States", lat: 41.8781, lng: -87.6298 },
   "best-coffee-in-seattle": { continent: "North America", country: "United States", lat: 47.6062, lng: -122.3321 },
