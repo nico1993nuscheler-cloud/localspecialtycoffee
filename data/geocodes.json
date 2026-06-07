@@ -2720,6 +2720,116 @@
     "confidence": "ok"
   },
   {
+    "webflow_id": "lsc-calibre-coffee-istanbul",
+    "slug": "calibre-coffee-istanbul",
+    "name": "Calibre Coffee",
+    "city": "Istanbul",
+    "lat": 41.0832985,
+    "lng": 28.9778805,
+    "resolvedAddress": "Seba Suites, Merkez, Cendere Cad. No:16/1F, 34408 Kağıthane/İstanbul, Türkiye",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-coffee-department-istanbul",
+    "slug": "coffee-department-istanbul",
+    "name": "Coffee Department",
+    "city": "Istanbul",
+    "lat": 41.0328574,
+    "lng": 28.9457956,
+    "resolvedAddress": "Ayvansaray, Kürkçü Çeşmesi Sk. No:5, 34087 Fatih/İstanbul, Türkiye",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-filtre-coffee-istanbul",
+    "slug": "filtre-coffee-istanbul",
+    "name": "Filtre Coffee & Roastery",
+    "city": "Istanbul",
+    "lat": 40.967461,
+    "lng": 29.087964,
+    "resolvedAddress": "Kozyatağı, Oral Sk. No:8-10 A, 34742 Kadıköy/İstanbul, Türkiye",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-kernel-coffee-istanbul",
+    "slug": "kernel-coffee-istanbul",
+    "name": "Kernel Coffee Roasters",
+    "city": "Istanbul",
+    "lat": 40.9631374,
+    "lng": 29.081273699999997,
+    "resolvedAddress": "Suadiye, Çolak İsmail Sk. no:15/A, 34740 Kadıköy/İstanbul, Türkiye",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-montag-coffee-istanbul",
+    "slug": "montag-coffee-istanbul",
+    "name": "Montag Coffee Roasters",
+    "city": "Istanbul",
+    "lat": 40.9900393,
+    "lng": 29.024232399999995,
+    "resolvedAddress": "Caferağa, Muvakkıthane Cd. No:16/A Kat:1, 34710, 34710 Kadıköy/İstanbul, Türkiye",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-norm-coffee-istanbul",
+    "slug": "norm-coffee-istanbul",
+    "name": "Norm Coffee",
+    "city": "Istanbul",
+    "lat": 41.031965,
+    "lng": 28.985308,
+    "resolvedAddress": "Cihangir, Güneşli Sok. 39/A, 34433 Beyoğlu/İstanbul, Türkiye",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-old-java-istanbul",
+    "slug": "old-java-istanbul",
+    "name": "Old Java Coffee Roasters",
+    "city": "Istanbul",
+    "lat": 41.0258648,
+    "lng": 28.9754824,
+    "resolvedAddress": "Müeyyetzade, Tatar Beyi Sk. No:8, 34425 Beyoğlu/İstanbul, Türkiye",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-pangea-coffee-istanbul",
+    "slug": "pangea-coffee-istanbul",
+    "name": "Pangea Roasting Co.",
+    "city": "Istanbul",
+    "lat": 41.0442647,
+    "lng": 29.003295100000003,
+    "resolvedAddress": "Sinanpaşa, Ihlamurdere Cd. No:22/B, 34353 Beşiktaş/İstanbul, Türkiye",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-parsa-coffee-roasters-istanbul",
+    "slug": "parsa-coffee-roasters-istanbul",
+    "name": "Parsa Coffee Roasters",
+    "city": "Istanbul",
+    "lat": 41.0242778,
+    "lng": 28.977995300000003,
+    "resolvedAddress": "Kemankeş Karamustafa Paşa, Hoca Tahsin Sk. No:6, 34425 Beyoğlu/İstanbul, Türkiye",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-probador-colectiva-istanbul",
+    "slug": "probador-colectiva-istanbul",
+    "name": "Probador Colectiva",
+    "city": "Istanbul",
+    "lat": 41.0288889,
+    "lng": 28.980000000000004,
+    "resolvedAddress": "Firuzağa, Kadiriler Yokuşu Sok. No:69, 34425 Beyoğlu/İstanbul, Türkiye",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-whirl-roastery-istanbul",
+    "slug": "whirl-roastery-istanbul",
+    "name": "The Whirl Roastery",
+    "city": "Istanbul",
+    "lat": 41.114159,
+    "lng": 29.019151400000002,
+    "resolvedAddress": "Maslak Mah. AOS 2. Kısım 6. Sokak No:144, Maslak, 34398 Sarıyer/İstanbul, Türkiye",
+    "confidence": "ok"
+  },
+  {
     "webflow_id": "lsc-about-us-coffee-kyoto",
     "slug": "about-us-coffee-kyoto",
     "name": "About Us Coffee",

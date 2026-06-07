@@ -24,6 +24,7 @@ export type GeoMeta = {
 
 const META: Record<string, GeoMeta> = {
   // Europe
+  "specialty-coffee-istanbul": { continent: "Europe", country: "Turkey", lat: 41.0257, lng: 28.9744 },
   "specialty-coffee-edinburgh": { continent: "Europe", country: "United Kingdom", lat: 55.9533, lng: -3.1883 },
   "specialty-coffee-warsaw": { continent: "Europe", country: "Poland", lat: 52.2297, lng: 21.0122 },
   "specialty-coffee-milan-italy": { continent: "Europe", country: "Italy", lat: 45.4642, lng: 9.19 },
@@ -137,6 +138,7 @@ export function getCityCenters(): CityCenter[] {
 }
 
 const COUNTRY_FLAGS: Record<string, string> = {
+  "Turkey": "🇹🇷",
   "India": "🇮🇳",
   "Indonesia": "🇮🇩",
   "Poland": "🇵🇱",
