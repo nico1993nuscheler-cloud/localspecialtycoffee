@@ -1,5 +1,5 @@
 # Geocode report
 
-817 places resolved total · 810 with coords · 0 need review.
+829 places resolved total · 822 with coords · 0 need review.
 
 ✓ No low-confidence matches in this run.

@@ -2480,6 +2480,126 @@
     "confidence": "ok"
   },
   {
+    "webflow_id": "lsc-belum-coffee-bar-hamburg",
+    "slug": "belum-coffee-bar-hamburg",
+    "name": "Belum Coffee Bar",
+    "city": "Hamburg",
+    "lat": 53.594539999999995,
+    "lng": 9.98448,
+    "resolvedAddress": "Geschwister-Scholl-Straße 32, 20251 Hamburg, Germany",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-black-delight-hamburg",
+    "slug": "black-delight-hamburg",
+    "name": "Black Delight",
+    "city": "Hamburg",
+    "lat": 53.55515,
+    "lng": 9.92684,
+    "resolvedAddress": "Friedensallee 32, 22765 Hamburg, Germany",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-black-hat-coffee-hamburg",
+    "slug": "black-hat-coffee-hamburg",
+    "name": "Black Hat",
+    "city": "Hamburg",
+    "lat": 53.573079199999995,
+    "lng": 9.960520299999999,
+    "resolvedAddress": "Eppendorfer Weg 66, 20259 Hamburg, Germany",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-due-baristi-hamburg",
+    "slug": "due-baristi-hamburg",
+    "name": "Due Baristi",
+    "city": "Hamburg",
+    "lat": 53.578275999999995,
+    "lng": 9.941468,
+    "resolvedAddress": "Langenfelder Damm 2-4, 20257 Hamburg, Germany",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-elbgold-hamburg",
+    "slug": "elbgold-hamburg",
+    "name": "Elbgold",
+    "city": "Hamburg",
+    "lat": 53.5632199,
+    "lng": 9.967074799999999,
+    "resolvedAddress": "Lagerstraße 34c, 20357 Hamburg, Germany",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-manufact-coffee-roasters-hamburg",
+    "slug": "manufact-coffee-roasters-hamburg",
+    "name": "Manufact Coffee Roasters",
+    "city": "Hamburg",
+    "lat": 53.5597633,
+    "lng": 9.967109599999999,
+    "resolvedAddress": "Sternstraße 68, 20357 Hamburg, Germany",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-milch-hamburg",
+    "slug": "milch-hamburg",
+    "name": "Milch",
+    "city": "Hamburg",
+    "lat": 53.5459416,
+    "lng": 9.9747229,
+    "resolvedAddress": "Ditmar-Koel-Straße 22, 20459 Hamburg, Germany",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-nord-coast-coffee-roastery-hamburg",
+    "slug": "nord-coast-coffee-roastery-hamburg",
+    "name": "Nord Coast Coffee Roastery",
+    "city": "Hamburg",
+    "lat": 53.5465468,
+    "lng": 9.9880256,
+    "resolvedAddress": "Deichstraße 9, 20459 Hamburg, Germany",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-playground-coffee-hamburg",
+    "slug": "playground-coffee-hamburg",
+    "name": "Playground Coffee & Roastery",
+    "city": "Hamburg",
+    "lat": 53.5516693,
+    "lng": 9.9653817,
+    "resolvedAddress": "Detlev-Bremer-Straße 21, 20359 Hamburg, Germany",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-public-coffee-roasters-hamburg",
+    "slug": "public-coffee-roasters-hamburg",
+    "name": "Public Coffee Roasters",
+    "city": "Hamburg",
+    "lat": 53.5513939,
+    "lng": 9.9825573,
+    "resolvedAddress": "Wexstraße 28, 20355 Hamburg, Germany",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-stockholm-coffee-roasters-hamburg",
+    "slug": "stockholm-coffee-roasters-hamburg",
+    "name": "Stockholm Coffee Roasters",
+    "city": "Hamburg",
+    "lat": 53.582755,
+    "lng": 10.0119741,
+    "resolvedAddress": "Peter-Marquard-Straße 10, 22303 Hamburg, Germany",
+    "confidence": "ok"
+  },
+  {
+    "webflow_id": "lsc-third-room-hamburg",
+    "slug": "third-room-hamburg",
+    "name": "Third Room",
+    "city": "Hamburg",
+    "lat": 53.575643799999995,
+    "lng": 9.955214999999999,
+    "resolvedAddress": "Emilienstraße, 20259 Hamburg, Germany",
+    "confidence": "ok"
+  },
+  {
     "webflow_id": "lsc-18-grams-helsinki",
     "slug": "18-grams-helsinki",
     "name": "18 Grams",
