@@ -55,6 +55,8 @@ export default async function WorldOfCoffeeBrusselsPage() {
     endDate: "2026-06-27",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     eventStatus: "https://schema.org/EventScheduled",
+    // Google recommends an absolute, crawlable image for Event rich results.
+    ...(city.featured_image_url ? { image: [city.featured_image_url] } : {}),
     location: {
       "@type": "Place",
       name: "Brussels Expo",
@@ -65,6 +67,19 @@ export default async function WorldOfCoffeeBrusselsPage() {
         addressLocality: "Brussels",
         addressCountry: "BE",
       },
+    },
+    // The SCA is the actual host of World of Coffee; we attribute it explicitly.
+    organizer: {
+      "@type": "Organization",
+      name: "Specialty Coffee Association",
+      url: "https://sca.coffee",
+    },
+    // Tickets are sold on the official event site, not by us.
+    offers: {
+      "@type": "Offer",
+      url: "https://europe.worldofcoffee.org/",
+      availability: "https://schema.org/InStock",
+      validFrom: "2025-06-19",
     },
     description:
       "The Specialty Coffee Association's flagship European trade show. This page is an independent local guide to specialty coffee in Brussels for attendees.",
