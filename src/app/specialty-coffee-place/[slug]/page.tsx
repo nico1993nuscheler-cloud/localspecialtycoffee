@@ -27,16 +27,52 @@ function normalizeStem(s: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+// SEO filler tokens in city slugs. Stripping them leaves the geographic stem
+// that cafe slugs actually end with: "best-coffee-in-austin" → "austin",
+// "specialty-coffee-shop-munich" → "munich", "portland-coffee-roasters" →
+// "portland". Trailing country qualifiers ("...-france", "...-japan") and the
+// stray Webflow hash ("riyadh-9db9a") are stripped too.
+const CITY_SLUG_FILLER = new Set([
+  "best", "good", "coffee", "cafes", "cafe", "specialty", "shop", "shops",
+  "roasters", "roaster", "in", "the", "of", "places", "place", "find", "guide",
+  "and", "for",
+]);
+const COUNTRY_QUALIFIER = new Set([
+  "france", "italy", "japan", "colombia", "argentina", "israel", "mexico", "taiwan",
+]);
+
+// Derive every plausible geo-stem for a city from its slug, e.g.
+// "best-coffee-shops-in-new-york" → "new-york". Returns the longest run of
+// non-filler tokens (the trailing geographic portion).
+function citySlugStems(slug: string): string[] {
+  let tokens = slug.toLowerCase().split("-")
+    .filter((t) => !(t.length === 5 && /\d/.test(t))); // drop Webflow hash tokens like "9db9a"
+  // Strip a trailing country qualifier ("...-mexico", "...-japan") but only at
+  // the end, so "mexico-city-mexico" keeps the leading "mexico" of the city name.
+  if (tokens.length > 1 && COUNTRY_QUALIFIER.has(tokens[tokens.length - 1])) {
+    tokens = tokens.slice(0, -1);
+  }
+  const geo = tokens.filter((t) => !CITY_SLUG_FILLER.has(t));
+  return geo.length > 0 ? [geo.join("-")] : [];
+}
+
 // When a cafe slug doesn't resolve (cafe was dropped from a city's shortlist
 // or renamed), try to recover the city from the slug's suffix and redirect
 // there with a 301 instead of dropping a 404. This preserves any organic
-// equity flowing to the old URL.
+// equity flowing to the old URL. We match against stems derived from both the
+// city NAME and the city SLUG: names like "Austin, TX" / "München" normalize
+// to "austin-tx" / "munchen", which don't match the cafe suffix ("-austin",
+// "-munich") — the slug-derived stem does.
 async function redirectTargetForMissingPlace(slug: string): Promise<string | null> {
   const cities = await getAllCities();
-  // Sort by stem length descending so "buenos-aires" wins over "aires" etc.
   const byStem = cities
-    .map((c) => ({ stem: normalizeStem(c.name), citySlug: c.slug }))
-    .filter((c) => c.stem.length > 0)
+    .flatMap((c) => {
+      const stems = new Set([normalizeStem(c.name), ...citySlugStems(c.slug)]);
+      return [...stems]
+        .filter((stem) => stem.length >= 4)
+        .map((stem) => ({ stem, citySlug: c.slug }));
+    })
+    // Longest stem first so "buenos-aires" wins over "aires", "new-york" over "york".
     .sort((a, b) => b.stem.length - a.stem.length);
   const slugLower = slug.toLowerCase();
   for (const { stem, citySlug } of byStem) {

@@ -13,3 +13,6 @@ out
 data/snapshots/
 data/.tmp/
 .env*.local
+
+# Disposable scratch/intermediates
+.tmp/
