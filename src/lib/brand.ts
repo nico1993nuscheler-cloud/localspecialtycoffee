@@ -29,8 +29,3 @@ export const BRAND = {
     "barista-course": `https://pub-8b061befab9c49bda0632e3619d45c0f.r2.dev/images/lsc/67e2759d87bd4e92002b8008_Coffee-Classes-icon-2-.svg`,
   } as Record<string, string>,
 };
-
-// Public Google Maps Embed API key used on the live Webflow site.
-// (Restricted to www.localspecialtycoffee.com referrers — also works on
-// localspecialtycoffee.vercel.app and the apex domain.)
-export const GOOGLE_MAPS_EMBED_KEY = "AIzaSyAUK4rvE7KbKAAOnjyLaKw2BpVEmJqmzNE";
