@@ -15,12 +15,17 @@ import {
 import { PlaceCard } from "@/components/PlaceCard";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 
-export const dynamicParams = true;
+// SEO FIX (Jun 14, 2026): Changed from `true` to `false`.
+// Thin feature combos not in generateStaticParams now return instant 404
+// instead of risking Vercel function timeouts → 500. The noindex,follow
+// intent is preserved because Google won't index a 404 anyway. Any
+// feature combo we WANT indexed gets pre-built via generateStaticParams.
+export const dynamicParams = false;
 export const revalidate = 2592000;
 
 export async function generateStaticParams() {
-  // Pre-render only the indexable combos; thinner ones still resolve at
-  // runtime (dynamicParams = true) but serve noindex,follow.
+  // Pre-render only the indexable combos; thinner ones now 404 since
+  // dynamicParams = false (was true before the Jun 14 SEO fix).
   const params: { slug: string; feature: string }[] = [];
   const cities = await getAllCities();
   for (const c of cities) {

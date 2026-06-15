@@ -21,7 +21,14 @@ import { placesToMapPoints } from "@/lib/geo-points";
 
 const SITE = "https://www.localspecialtycoffee.com";
 
-export const dynamicParams = true;
+// CRITICAL SEO FIX (Jun 14, 2026): Changed from `true` to `false`.
+// With `true`, unknown slugs triggered dynamic rendering → Footer N+1
+// queries → Vercel function timeout → 500 errors. This caused 951 5XX
+// errors in the Ahrefs audit. With `false`, unknown slugs return an
+// instant 404 without invoking any server function.
+// New cities still work because every CMS injection triggers a deploy
+// (which re-runs generateStaticParams).
+export const dynamicParams = false;
 export const revalidate = 2592000;
 
 export async function generateStaticParams() {

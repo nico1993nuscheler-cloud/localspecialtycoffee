@@ -3,7 +3,7 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { OpenCookieSettings } from "@/components/OpenCookieSettings";
-import { getAllCities, getPlacesInCity } from "@/lib/data";
+import { getAllCities, getAllPlaces } from "@/lib/data";
 
 const TAGLINE_BY_CITY: Record<string, string> = {
   "best-coffee-shops-in-new-york": "Explore NY's specialty coffee scene",
@@ -15,13 +15,19 @@ const TAGLINE_BY_CITY: Record<string, string> = {
 };
 
 export async function Footer() {
-  const cities = await getAllCities();
-  const withCounts = await Promise.all(
-    cities.map(async (c) => ({
-      ...c,
-      _count: (await getPlacesInCity(c.webflow_id)).length,
-    })),
-  );
+  // SEO FIX (Jun 14, 2026): Replaced N+1 getPlacesInCity() calls (one per
+  // city) with a single getAllPlaces() + in-memory grouping. The old pattern
+  // caused Vercel function timeouts on dynamically-rendered pages (including
+  // 404/not-found) because the Footer is part of the root layout.
+  const [cities, places] = await Promise.all([getAllCities(), getAllPlaces()]);
+  const countByCity = new Map<string, number>();
+  for (const p of places) {
+    countByCity.set(p.city_webflow_id, (countByCity.get(p.city_webflow_id) ?? 0) + 1);
+  }
+  const withCounts = cities.map((c) => ({
+    ...c,
+    _count: countByCity.get(c.webflow_id) ?? 0,
+  }));
   const featuredFooterCities = withCounts
     .sort((a, b) => b._count - a._count)
     .slice(0, 3);
