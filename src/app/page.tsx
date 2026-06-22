@@ -7,7 +7,7 @@ import {
   getPlacesInCity,
   getPlaceBySlug,
 } from "@/lib/data";
-import type { PlaceWithRefs } from "@/lib/types";
+import type { Category, City, PlaceWithRefs } from "@/lib/types";
 import { HeroCollage } from "@/components/HeroCollage";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 import { TrendingShuffle } from "@/components/TrendingShuffle";
@@ -24,29 +24,42 @@ const CATEGORY_TAGLINES: Record<string, string> = {
 };
 
 export default async function HomePage() {
-  const [cities, categories, allPlaces] = await Promise.all([
-    getAllCities(),
-    getAllCategories(),
-    getAllPlaces(),
-  ]);
-  const citiesWithCountsArr = await Promise.all(
-    cities.map(async (c) => ({
-      ...c,
-      _count: (await getPlacesInCity(c.webflow_id)).length,
-    })),
-  );
+  // BUILD RESILIENCE: withDbRetry rides out a cold/paused Supabase. If the DB
+  // is still unreachable after retries, degrade to empty collections rather
+  // than aborting the build; ISR rebuilds the homepage once the DB is back.
+  let cities: City[] = [];
+  let categories: Category[] = [];
+  let citiesWithCountsArr: Array<City & { _count: number }> = [];
+  let pool: PlaceWithRefs[] = [];
+  try {
+    const [c, cat, allPlaces] = await Promise.all([
+      getAllCities(),
+      getAllCategories(),
+      getAllPlaces(),
+    ]);
+    cities = c;
+    categories = cat;
+    citiesWithCountsArr = await Promise.all(
+      cities.map(async (c) => ({
+        ...c,
+        _count: (await getPlacesInCity(c.webflow_id)).length,
+      })),
+    );
 
-  // Trending pool: up to 3 places per city across all cities.
-  const pool: PlaceWithRefs[] = (
-    await Promise.all(
-      citiesWithCountsArr.flatMap((c) =>
-        allPlaces
-          .filter((p) => p.city_webflow_id === c.webflow_id)
-          .slice(0, 3)
-          .map((p) => getPlaceBySlug(p.slug)),
-      ),
-    )
-  ).filter((p): p is PlaceWithRefs => !!p);
+    // Trending pool: up to 3 places per city across all cities.
+    pool = (
+      await Promise.all(
+        citiesWithCountsArr.flatMap((c) =>
+          allPlaces
+            .filter((p) => p.city_webflow_id === c.webflow_id)
+            .slice(0, 3)
+            .map((p) => getPlaceBySlug(p.slug)),
+        ),
+      )
+    ).filter((p): p is PlaceWithRefs => !!p);
+  } catch (err) {
+    console.error("[/] Supabase unreachable after retries; rendering degraded homepage. Error:", err);
+  }
 
   const citiesWithCounts = citiesWithCountsArr;
 

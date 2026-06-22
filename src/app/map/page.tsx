@@ -8,7 +8,9 @@ export const revalidate = 86400;
 const SITE = "https://www.localspecialtycoffee.com";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const points = await getAllMapPoints();
+  // withDbRetry covers a cold Supabase; on a persistent outage fall back to a
+  // 0-count description so metadata collection doesn't abort the build.
+  const points = await getAllMapPoints().catch(() => []);
   const title = "The Specialty Coffee Map — Every Spot in One Place";
   const description = `Every specialty café and roaster we've curated worldwide (${points.length} and counting), on one live map. Open it in Google Maps or save it for your next trip.`;
   return {
@@ -20,7 +22,16 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function GlobalMapPage() {
-  const [points, cities] = await Promise.all([getAllMapPoints(), getAllCities()]);
+  // BUILD RESILIENCE: withDbRetry rides out a cold Supabase; on a persistent
+  // outage degrade to an empty map rather than aborting the build. ISR refills
+  // it once the DB is reachable.
+  let points: Awaited<ReturnType<typeof getAllMapPoints>> = [];
+  let cities: Awaited<ReturnType<typeof getAllCities>> = [];
+  try {
+    [points, cities] = await Promise.all([getAllMapPoints(), getAllCities()]);
+  } catch (err) {
+    console.error("[/map] Supabase unreachable after retries; rendering empty map. Error:", err);
+  }
   const cityCount = new Set(points.map((p) => p.citySlug)).size;
 
   // ItemList of every covered city (linking to its map) — gives the global map

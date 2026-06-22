@@ -26,7 +26,9 @@ export default async function BadgePage({
   // the badge using the (invalid) slug as-is, because the badge itself
   // is just a URL builder and a bad slug just means a 404 link, not a
   // broken badge page.
-  const cafe = slug ? await getPlaceBySlug(slug) : null;
+  // Resolution failure (including a transient DB outage) is non-fatal — fall
+  // back to the raw slug per the note above.
+  const cafe = slug ? await getPlaceBySlug(slug).catch(() => null) : null;
   const effectiveSlug = cafe?.slug ?? slug ?? null;
   const profileUrl = buildProfileUrl(effectiveSlug);
   const inlineSnippet = buildBadgeSnippet({ variant: "inline", slug: effectiveSlug });
