@@ -6,6 +6,7 @@ import {
   getAllCities,
   getCityBySlug,
   getPlacesInCity,
+  safeStaticParams,
 } from "@/lib/data";
 import {
   LANDING_FEATURES,
@@ -26,20 +27,28 @@ export const revalidate = 2592000;
 export async function generateStaticParams() {
   // Pre-render only the indexable combos; thinner ones now 404 since
   // dynamicParams = false (was true before the Jun 14 SEO fix).
-  const params: { slug: string; feature: string }[] = [];
-  const cities = await getAllCities();
-  for (const c of cities) {
-    const places = await getPlacesInCity(c.webflow_id);
-    for (const f of LANDING_FEATURES) {
-      const matches = places.filter(
-        (p) => (p as unknown as Record<string, boolean>)[f.boolean],
-      );
-      if (matches.length >= MIN_INDEXABLE_LANDING_PLACES) {
-        params.push({ slug: c.slug, feature: f.slug });
+  //
+  // Wrapped in safeStaticParams: this is the route whose page-data collection
+  // was aborting the production build on a cold/paused Supabase (PGRST002).
+  // withDbRetry rides out transient outages; if the DB is STILL down after all
+  // retries, we return [] so the build completes instead of failing. The next
+  // deploy/rebuild re-runs this against a healthy DB and restores the combos.
+  return safeStaticParams(async () => {
+    const params: { slug: string; feature: string }[] = [];
+    const cities = await getAllCities();
+    for (const c of cities) {
+      const places = await getPlacesInCity(c.webflow_id);
+      for (const f of LANDING_FEATURES) {
+        const matches = places.filter(
+          (p) => (p as unknown as Record<string, boolean>)[f.boolean],
+        );
+        if (matches.length >= MIN_INDEXABLE_LANDING_PLACES) {
+          params.push({ slug: c.slug, feature: f.slug });
+        }
       }
     }
-  }
-  return params;
+    return params;
+  }, "cities/[slug]/[feature]");
 }
 
 export async function generateMetadata({

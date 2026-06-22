@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getAllCities, getCityBySlug, getPlacesInCity } from "@/lib/data";
+import { getAllCities, getCityBySlug, getPlacesInCity, safeStaticParams } from "@/lib/data";
 import { placesToMapPoints } from "@/lib/geo-points";
 import { ShareableMap } from "@/components/ShareableMap";
 import type { PlaceWithRefs } from "@/lib/types";
@@ -11,7 +11,12 @@ export const revalidate = 86400;
 const SITE = "https://www.localspecialtycoffee.com";
 
 export async function generateStaticParams() {
-  return (await getAllCities()).map((c) => ({ slug: c.slug }));
+  // dynamicParams = true here, so an empty fallback on a DB outage is fully
+  // covered by ISR — pages render on first request once Supabase is back.
+  return safeStaticParams(
+    async () => (await getAllCities()).map((c) => ({ slug: c.slug })),
+    "map/[slug]",
+  );
 }
 
 function listJoin(items: string[]): string {

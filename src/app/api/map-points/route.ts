@@ -7,11 +7,24 @@ import type { MapPoint } from "@/lib/geo-points";
 export const revalidate = 2592000;
 
 export async function GET() {
-  const [places, cities, categories] = await Promise.all([
-    getAllPlaces(),
-    getAllCities(),
-    getAllCategories(),
-  ]);
+  // withDbRetry (in the data layer) rides out a cold / paused Supabase here.
+  // If the DB is STILL unreachable after retries at build/prerender time, fall
+  // back to an empty overlay instead of aborting the build — this is a lazily
+  // loaded, non-critical globe overlay and ISR refills it once the DB is back.
+  let places, cities, categories;
+  try {
+    [places, cities, categories] = await Promise.all([
+      getAllPlaces(),
+      getAllCities(),
+      getAllCategories(),
+    ]);
+  } catch (err) {
+    console.error(
+      "[/api/map-points] Supabase unreachable after retries; serving empty overlay. Error:",
+      err,
+    );
+    return Response.json({ points: [] });
+  }
   const cityBy = new Map(cities.map((c) => [c.webflow_id, c]));
   const catBy = new Map(categories.map((c) => [c.webflow_id, c]));
 

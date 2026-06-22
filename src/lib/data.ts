@@ -21,7 +21,7 @@
 
 import "server-only";
 import { unstable_cache } from "next/cache";
-import { supabase } from "./supabase";
+import { supabase, withDbRetry } from "./supabase";
 import type { Category, City, Place, PlaceWithRefs } from "./types";
 import type { MapPoint } from "./geo-points";
 import {
@@ -39,55 +39,59 @@ type CityLight = City;
 type PlaceLight = Place;
 
 const loadCategories = unstable_cache(
-  async (): Promise<Category[]> => {
-    const { data, error } = await supabase.from("lsc_categories").select("*");
-    if (error) throw error;
-    return data as Category[];
-  },
+  async (): Promise<Category[]> =>
+    withDbRetry(async () => {
+      const { data, error } = await supabase.from("lsc_categories").select("*");
+      if (error) throw error;
+      return data as Category[];
+    }, { label: "loadCategories" }),
   ["lsc-categories"],
   { revalidate: 2592000, tags: ["lsc-data"] },
 );
 
 const loadCities = unstable_cache(
-  async (): Promise<CityLight[]> => {
-    const { data, error } = await supabase
-      .from("lsc_cities")
-      .select(
-        "webflow_id,slug,name,h1,meta_description,summary,excerpt_short,excerpt_long,seo_h2,thumbnail_v1_url,thumbnail_v2_url,thumbnail_v3_url,featured_image_url,photo_gallery,google_maps_url,created_at",
+  async (): Promise<CityLight[]> =>
+    withDbRetry(async () => {
+      const { data, error } = await supabase
+        .from("lsc_cities")
+        .select(
+          "webflow_id,slug,name,h1,meta_description,summary,excerpt_short,excerpt_long,seo_h2,thumbnail_v1_url,thumbnail_v2_url,thumbnail_v3_url,featured_image_url,photo_gallery,google_maps_url,created_at",
+        );
+      if (error) throw error;
+      return (data as Array<Record<string, unknown>>).map(
+        (r) =>
+          ({
+            ...r,
+            seo_paragraph: null,
+            // updated_at column added separately via migration — read it if
+            // present, otherwise fall back to created_at so sitemap lastmod
+            // still has a real per-row value.
+            updated_at: (r as Record<string, unknown>).updated_at ?? r.created_at ?? null,
+          }) as unknown as CityLight,
       );
-    if (error) throw error;
-    return (data as Array<Record<string, unknown>>).map(
-      (r) =>
-        ({
-          ...r,
-          seo_paragraph: null,
-          // updated_at column added separately via migration — read it if
-          // present, otherwise fall back to created_at so sitemap lastmod
-          // still has a real per-row value.
-          updated_at: (r as Record<string, unknown>).updated_at ?? r.created_at ?? null,
-        }) as unknown as CityLight,
-    );
-  },
+    }, { label: "loadCities" }),
   ["lsc-cities-light"],
   { revalidate: 2592000, tags: ["lsc-data"] },
 );
 
 // Resolve city_id (uuid) → webflow_id once, cached. Tiny.
 const loadCityIdMap = unstable_cache(
-  async (): Promise<Record<string, string>> => {
-    const { data, error } = await supabase.from("lsc_cities").select("id,webflow_id");
-    if (error) throw error;
-    return Object.fromEntries(data.map((r) => [r.id, r.webflow_id]));
-  },
+  async (): Promise<Record<string, string>> =>
+    withDbRetry(async () => {
+      const { data, error } = await supabase.from("lsc_cities").select("id,webflow_id");
+      if (error) throw error;
+      return Object.fromEntries(data.map((r) => [r.id, r.webflow_id]));
+    }, { label: "loadCityIdMap" }),
   ["lsc-city-id-map"],
   { revalidate: 2592000, tags: ["lsc-data"] },
 );
 const loadCategoryIdMap = unstable_cache(
-  async (): Promise<Record<string, string>> => {
-    const { data, error } = await supabase.from("lsc_categories").select("id,webflow_id");
-    if (error) throw error;
-    return Object.fromEntries(data.map((r) => [r.id, r.webflow_id]));
-  },
+  async (): Promise<Record<string, string>> =>
+    withDbRetry(async () => {
+      const { data, error } = await supabase.from("lsc_categories").select("id,webflow_id");
+      if (error) throw error;
+      return Object.fromEntries(data.map((r) => [r.id, r.webflow_id]));
+    }, { label: "loadCategoryIdMap" }),
   ["lsc-category-id-map"],
   { revalidate: 2592000, tags: ["lsc-data"] },
 );
@@ -96,12 +100,15 @@ const loadPlacesLight = unstable_cache(
   async (): Promise<PlaceLight[]> => {
     // Explicit projection — exclude `about` and `summary` to keep total
     // payload under 1 MB. Single round-trip, no pagination needed for 547.
-    const { data, error } = await supabase
-      .from("lsc_coffee_places")
-      .select(
-        "webflow_id,slug,name,city_id,category_id,excerpt_short,excerpt_long,flavour_profile,button_text,rating,address,latitude,longitude,hours_weekday,hours_saturday,hours_sunday,thumbnail_v1_url,thumbnail_v2_url,thumbnail_v3_url,featured_image_url,photo_gallery,website,instagram,booking_link,phone,email,is_featured,in_house_roasting,ethical_sourcing,single_origin,award_winning,micro_lots,experimental_styles,hand_brews,batch_brews,espresso_milk_drinks,decaf_options,alt_milk,cold_brew,offers_classes,retail_beans,online_beans,pastry_snacks,lunch_brunch,work_friendly,outdoor_seating,pet_friendly,certified_baristas,ships_internationally,subscription,to_go,byo_cup_loyalty,community_events,created_at",
-      );
-    if (error) throw error;
+    const data = await withDbRetry(async () => {
+      const { data, error } = await supabase
+        .from("lsc_coffee_places")
+        .select(
+          "webflow_id,slug,name,city_id,category_id,excerpt_short,excerpt_long,flavour_profile,button_text,rating,address,latitude,longitude,hours_weekday,hours_saturday,hours_sunday,thumbnail_v1_url,thumbnail_v2_url,thumbnail_v3_url,featured_image_url,photo_gallery,website,instagram,booking_link,phone,email,is_featured,in_house_roasting,ethical_sourcing,single_origin,award_winning,micro_lots,experimental_styles,hand_brews,batch_brews,espresso_milk_drinks,decaf_options,alt_milk,cold_brew,offers_classes,retail_beans,online_beans,pastry_snacks,lunch_brunch,work_friendly,outdoor_seating,pet_friendly,certified_baristas,ships_internationally,subscription,to_go,byo_cup_loyalty,community_events,created_at",
+        );
+      if (error) throw error;
+      return data;
+    }, { label: "loadPlacesLight" });
 
     const [cityMap, catMap] = await Promise.all([loadCityIdMap(), loadCategoryIdMap()]);
     return (data as Array<Record<string, unknown>>).map((p) => {
@@ -120,6 +127,33 @@ const loadPlacesLight = unstable_cache(
   ["lsc-places-light"],
   { revalidate: 2592000, tags: ["lsc-data"] },
 );
+
+// ── Build-time fallback ──
+// `withDbRetry` already rides out a transient / cold-starting Supabase. If the
+// DB is STILL unreachable after all retries (e.g. a long Free-tier pause or a
+// real outage), the underlying loaders re-throw — which historically aborted
+// the whole `next build` with "Failed to collect page data". `safeStaticParams`
+// wraps a route's generateStaticParams producer so that, in that worst case, it
+// returns an empty (or partial) param set instead of throwing. The build then
+// completes; pages fill in via ISR / dynamicParams on the next request or
+// rebuild once the DB is back. Routes that must still serve pages while the
+// pre-render set is empty should keep `dynamicParams = true`.
+export async function safeStaticParams<T>(
+  producer: () => Promise<T[]>,
+  routeLabel: string,
+): Promise<T[]> {
+  try {
+    return await producer();
+  } catch (err) {
+    console.error(
+      `[generateStaticParams] Supabase unreachable after retries for "${routeLabel}". ` +
+        `Falling back to an empty param set so the build does not abort; pages will ` +
+        `be generated on-demand via ISR once the DB is reachable. Error:`,
+      err,
+    );
+    return [];
+  }
+}
 
 // ── Public API ──
 
@@ -181,12 +215,15 @@ export async function getCategoryBySlug(slug: string): Promise<Category | undefi
 /** Full city row including seo_paragraph (used on city detail page). */
 export async function getCityBySlug(slug: string): Promise<City | undefined> {
   if (PREVIEW_ENABLED && slug === PREVIEW_CITY_SLUG) return getPreviewCity();
-  const { data, error } = await supabase
-    .from("lsc_cities")
-    .select("*")
-    .eq("slug", slug)
-    .maybeSingle();
-  if (error) throw error;
+  const data = await withDbRetry(async () => {
+    const { data, error } = await supabase
+      .from("lsc_cities")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (error) throw error;
+    return data;
+  }, { label: `getCityBySlug:${slug}` });
   if (!data) return undefined;
   return data as City;
 }
@@ -201,12 +238,15 @@ export async function getPlaceBySlug(slug: string): Promise<PlaceWithRefs | unde
       if (category) return { ...previewPlace, city: getPreviewCity(), category };
     }
   }
-  const { data, error } = await supabase
-    .from("lsc_coffee_places")
-    .select("*")
-    .eq("slug", slug)
-    .maybeSingle();
-  if (error) throw error;
+  const data = await withDbRetry(async () => {
+    const { data, error } = await supabase
+      .from("lsc_coffee_places")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (error) throw error;
+    return data;
+  }, { label: `getPlaceBySlug:${slug}` });
   if (!data) return undefined;
   const [cityMap, catMap, cities, cats] = await Promise.all([
     loadCityIdMap(),

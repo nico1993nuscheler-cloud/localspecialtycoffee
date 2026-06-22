@@ -4,6 +4,7 @@ import { BRAND } from "@/lib/brand";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { OpenCookieSettings } from "@/components/OpenCookieSettings";
 import { getAllCities, getAllPlaces } from "@/lib/data";
+import type { City } from "@/lib/types";
 
 const TAGLINE_BY_CITY: Record<string, string> = {
   "best-coffee-shops-in-new-york": "Explore NY's specialty coffee scene",
@@ -19,18 +20,32 @@ export async function Footer() {
   // city) with a single getAllPlaces() + in-memory grouping. The old pattern
   // caused Vercel function timeouts on dynamically-rendered pages (including
   // 404/not-found) because the Footer is part of the root layout.
-  const [cities, places] = await Promise.all([getAllCities(), getAllPlaces()]);
-  const countByCity = new Map<string, number>();
-  for (const p of places) {
-    countByCity.set(p.city_webflow_id, (countByCity.get(p.city_webflow_id) ?? 0) + 1);
+  //
+  // BUILD RESILIENCE: the Footer is in the root layout, so it runs on EVERY
+  // page's prerender — including static pages like /about. withDbRetry (in the
+  // data layer) rides out a cold / paused Supabase. If the DB is STILL down
+  // after all retries, degrade gracefully to an empty featured-cities list
+  // instead of throwing (which would abort the whole build). The static footer
+  // links still render; ISR refills the dynamic block once the DB is back.
+  let featuredFooterCities: Array<City & { _count: number }> = [];
+  try {
+    const [cities, places] = await Promise.all([getAllCities(), getAllPlaces()]);
+    const countByCity = new Map<string, number>();
+    for (const p of places) {
+      countByCity.set(p.city_webflow_id, (countByCity.get(p.city_webflow_id) ?? 0) + 1);
+    }
+    const withCounts = cities.map((c) => ({
+      ...c,
+      _count: countByCity.get(c.webflow_id) ?? 0,
+    }));
+    featuredFooterCities = withCounts.sort((a, b) => b._count - a._count).slice(0, 3);
+  } catch (err) {
+    console.error(
+      "[Footer] Supabase unreachable after retries; rendering footer without the " +
+        "featured-cities block so the build does not abort. Error:",
+      err,
+    );
   }
-  const withCounts = cities.map((c) => ({
-    ...c,
-    _count: countByCity.get(c.webflow_id) ?? 0,
-  }));
-  const featuredFooterCities = withCounts
-    .sort((a, b) => b._count - a._count)
-    .slice(0, 3);
 
   return (
     <footer className="bg-ink text-white mt-20">

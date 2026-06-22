@@ -2,7 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
-import { getAllCities, getAllPlaces, getPlaceBySlug, getPlacesInCity } from "@/lib/data";
+import {
+  getAllCities,
+  getAllPlaces,
+  getPlaceBySlug,
+  getPlacesInCity,
+  safeStaticParams,
+} from "@/lib/data";
 import { getCityGeo } from "@/lib/geography";
 import { PlaceCard } from "@/components/PlaceCard";
 import { PlaceCTAs } from "@/components/PlaceCTAs";
@@ -13,7 +19,11 @@ export const dynamicParams = true;
 export const revalidate = 2592000;
 
 export async function generateStaticParams() {
-  return (await getAllPlaces()).map((p) => ({ slug: p.slug }));
+  // dynamicParams = true — empty fallback on a DB outage is covered by ISR.
+  return safeStaticParams(
+    async () => (await getAllPlaces()).map((p) => ({ slug: p.slug })),
+    "specialty-coffee-place/[slug]",
+  );
 }
 
 // Normalize a city name (or any string) to the kebab-case stem cafe slugs use.

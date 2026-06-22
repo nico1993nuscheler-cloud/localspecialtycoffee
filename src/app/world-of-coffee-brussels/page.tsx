@@ -19,8 +19,10 @@ const SITE = "https://www.localspecialtycoffee.com";
 const PATH = "/world-of-coffee-brussels";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const city = await getCityBySlug("best-coffee-in-brussels");
-  const count = city ? (await getPlacesInCity(city.webflow_id)).length : 0;
+  // withDbRetry covers a cold Supabase; on a persistent outage fall back to the
+  // count-less copy so metadata collection doesn't abort the build.
+  const city = await getCityBySlug("best-coffee-in-brussels").catch(() => undefined);
+  const count = city ? (await getPlacesInCity(city.webflow_id).catch(() => [])).length : 0;
   const title = "World of Coffee Brussels 2026: Where to Drink Specialty Coffee";
   const description = count
     ? `Heading to World of Coffee Brussels (Jun 25–27)? Our local guide to ${count} specialty cafés & roasters worth crossing the city for between cuppings.`
@@ -38,7 +40,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function WorldOfCoffeeBrusselsPage() {
-  const city = await getCityBySlug("best-coffee-in-brussels");
+  // BUILD RESILIENCE: withDbRetry rides out a cold Supabase. On a persistent
+  // outage, treat it like a missing city (404) instead of throwing and aborting
+  // the build; ISR regenerates the page once the DB is reachable.
+  const city = await getCityBySlug("best-coffee-in-brussels").catch(() => undefined);
   if (!city) return notFound();
 
   const [places, allCategories] = await Promise.all([
