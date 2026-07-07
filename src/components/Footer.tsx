@@ -3,7 +3,7 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { OpenCookieSettings } from "@/components/OpenCookieSettings";
-import { getAllCities, getAllPlaces } from "@/lib/data";
+import { getAllCities, getFooterCityCounts } from "@/lib/data";
 import type { City } from "@/lib/types";
 
 const TAGLINE_BY_CITY: Record<string, string> = {
@@ -21,22 +21,25 @@ export async function Footer() {
   // caused Vercel function timeouts on dynamically-rendered pages (including
   // 404/not-found) because the Footer is part of the root layout.
   //
+  // EGRESS FIX (Jul 2026): getAllPlaces() pulled the full ~2.3 MB
+  // places-light payload (every column, all rows) on every single page
+  // render just to count places per city — the Footer runs on every page,
+  // so this alone was the dominant driver of Supabase egress. Replaced with
+  // getFooterCityCounts(), which fetches only the `city_id` column.
+  //
   // BUILD RESILIENCE: the Footer is in the root layout, so it runs on EVERY
-  // page's prerender — including static pages like /about. withDbRetry (in the
-  // data layer) rides out a cold / paused Supabase. If the DB is STILL down
-  // after all retries, degrade gracefully to an empty featured-cities list
-  // instead of throwing (which would abort the whole build). The static footer
-  // links still render; ISR refills the dynamic block once the DB is back.
+  // page's prerender — including static pages like /about. withDbRetry (in
+  // the data layer, used inside getAllCities/getFooterCityCounts) rides out
+  // a cold / paused Supabase. If the DB is STILL down after all retries,
+  // degrade gracefully to an empty featured-cities list instead of throwing
+  // (which would abort the whole build). The static footer links still
+  // render; ISR refills the dynamic block once the DB is back.
   let featuredFooterCities: Array<City & { _count: number }> = [];
   try {
-    const [cities, places] = await Promise.all([getAllCities(), getAllPlaces()]);
-    const countByCity = new Map<string, number>();
-    for (const p of places) {
-      countByCity.set(p.city_webflow_id, (countByCity.get(p.city_webflow_id) ?? 0) + 1);
-    }
+    const [cities, countByCity] = await Promise.all([getAllCities(), getFooterCityCounts()]);
     const withCounts = cities.map((c) => ({
       ...c,
-      _count: countByCity.get(c.webflow_id) ?? 0,
+      _count: countByCity[c.webflow_id] ?? 0,
     }));
     featuredFooterCities = withCounts.sort((a, b) => b._count - a._count).slice(0, 3);
   } catch (err) {

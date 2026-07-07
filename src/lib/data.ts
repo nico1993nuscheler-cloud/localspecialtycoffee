@@ -155,6 +155,34 @@ export async function safeStaticParams<T>(
   }
 }
 
+// Places-per-city counts only — for the Footer's "N curated spots" / top-3
+// widget. The Footer renders on every single page (it's in the root layout,
+// including static/legal pages and 404s), so it must NOT depend on
+// getAllPlaces(): that pulls the full ~2.3 MB places-light payload (every
+// column, all 829 rows) just to count rows per city_id. This fetches only
+// the `city_id` column instead, cutting that per-page-render read by ~99%.
+const loadPlaceCityIds = unstable_cache(
+  async (): Promise<string[]> =>
+    withDbRetry(async () => {
+      const { data, error } = await supabase.from("lsc_coffee_places").select("city_id");
+      if (error) throw error;
+      return (data as Array<{ city_id: string }>).map((r) => r.city_id);
+    }, { label: "loadPlaceCityIds" }),
+  ["lsc-place-city-ids"],
+  { revalidate: 2592000, tags: ["lsc-data"] },
+);
+
+/** city webflow_id → number of places, for the Footer only. See loadPlaceCityIds. */
+export async function getFooterCityCounts(): Promise<Record<string, number>> {
+  const [cityIds, cityIdMap] = await Promise.all([loadPlaceCityIds(), loadCityIdMap()]);
+  const counts: Record<string, number> = {};
+  for (const cityId of cityIds) {
+    const webflowId = cityIdMap[cityId] ?? "";
+    counts[webflowId] = (counts[webflowId] ?? 0) + 1;
+  }
+  return counts;
+}
+
 // ── Public API ──
 
 export async function getAllCategories(): Promise<Category[]> {
