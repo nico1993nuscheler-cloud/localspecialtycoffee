@@ -95,7 +95,11 @@ async function redirectTargetForMissingPlace(slug: string): Promise<string | nul
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const p = await getPlaceBySlug(slug);
+  // BUILD RESILIENCE: this route is individually pre-rendered for all ~829
+  // slugs. withDbRetry already retries a transient DB error; if it's STILL
+  // failing after all retries, don't let one flaky page abort the whole
+  // build — degrade to no metadata for this page instead.
+  const p = await getPlaceBySlug(slug).catch(() => undefined);
   if (!p) return {};
   const year = new Date().getFullYear();
   // CTR rescue (May 31, 2026 GSC audit): cafe pages were ranking position
@@ -168,14 +172,20 @@ const FEATURE_GROUPS: { label: string; items: { key: string; label: string }[] }
 
 export default async function PlacePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const p = await getPlaceBySlug(slug);
+  // BUILD RESILIENCE: this route is individually pre-rendered for all ~829
+  // slugs during `next build`. A single query timing out here (even after
+  // withDbRetry's 5 attempts) used to abort the ENTIRE build. Treat a
+  // persistent failure the same as "not found" — the page self-heals on the
+  // next deploy or on-demand revalidate (`dynamicParams = true` above also
+  // covers slugs missing from generateStaticParams entirely).
+  const p = await getPlaceBySlug(slug).catch(() => undefined);
   if (!p) {
-    const target = await redirectTargetForMissingPlace(slug);
+    const target = await redirectTargetForMissingPlace(slug).catch(() => null);
     if (target) permanentRedirect(target);
     return notFound();
   }
 
-  const otherPlaces = (await getPlacesInCity(p.city_webflow_id))
+  const otherPlaces = (await getPlacesInCity(p.city_webflow_id).catch(() => []))
     .filter((o) => o.webflow_id !== p.webflow_id)
     .slice(0, 3);
 

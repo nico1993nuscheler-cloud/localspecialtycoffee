@@ -24,7 +24,10 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const cat = await getCategoryBySlug(slug);
+  // BUILD RESILIENCE: withDbRetry already retries a transient DB error; if
+  // it's STILL failing after all retries, don't let one flaky category abort
+  // the whole build — degrade to no metadata for this page instead.
+  const cat = await getCategoryBySlug(slug).catch(() => undefined);
   if (!cat) return {};
   return {
     title: `Local ${cat.name}s in your city`,
@@ -35,12 +38,24 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CategoryPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const cat = await getCategoryBySlug(slug);
+  // BUILD RESILIENCE: this route is individually pre-rendered for every
+  // category slug. dynamicParams = true (above) covers a slug missing from
+  // generateStaticParams entirely; this covers a slug that WAS included but
+  // whose own render failed after withDbRetry's retries — treat it as "not
+  // found" instead of aborting the whole build. Self-heals on next deploy
+  // or on-demand revalidate.
+  const cat = await getCategoryBySlug(slug).catch(() => undefined);
   if (!cat) return notFound();
-  const [places, allCities] = await Promise.all([
-    getPlacesInCategory(cat.webflow_id),
-    getAllCities(),
-  ]);
+  let places, allCities;
+  try {
+    [places, allCities] = await Promise.all([
+      getPlacesInCategory(cat.webflow_id),
+      getAllCities(),
+    ]);
+  } catch (err) {
+    console.error(`[categories/${slug}] Supabase unreachable after retries; serving 404 for this build. Error:`, err);
+    return notFound();
+  }
   // Only show cities that actually have a place in this category in the dropdown.
   const citiesWithPlaces = allCities.filter((c) =>
     places.some((p) => p.city.slug === c.slug),
