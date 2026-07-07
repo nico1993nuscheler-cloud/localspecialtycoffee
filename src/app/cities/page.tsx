@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getAllCities, getPlacesInCity } from "@/lib/data";
+import type { City } from "@/lib/types";
 import { CityFilters } from "@/components/CityFilters";
 
 export const metadata: Metadata = {
@@ -12,13 +13,21 @@ export const metadata: Metadata = {
 export const revalidate = 2592000;
 
 export default async function CitiesPage() {
-  const all = await getAllCities();
-  const cities = await Promise.all(
-    all.map(async (c) => ({
-      ...c,
-      _count: (await getPlacesInCity(c.webflow_id)).length,
-    })),
-  );
+  // BUILD RESILIENCE: withDbRetry rides out a cold/paused Supabase. If the DB
+  // is still unreachable after retries, degrade to an empty list rather than
+  // aborting the build; ISR refills this page once the DB is back.
+  let cities: Array<City & { _count: number }> = [];
+  try {
+    const all = await getAllCities();
+    cities = await Promise.all(
+      all.map(async (c) => ({
+        ...c,
+        _count: (await getPlacesInCity(c.webflow_id)).length,
+      })),
+    );
+  } catch (err) {
+    console.error("[/cities] Supabase unreachable after retries; rendering empty list. Error:", err);
+  }
 
   // CollectionPage + full ItemList of all cities. Previously this hub
   // shipped with zero structured data — Google had no machine-readable

@@ -8,6 +8,7 @@ import {
   getAllPlaces,
   getCityBySlug,
   getPlacesInCity,
+  safeStaticParams,
 } from "@/lib/data";
 import { PlaceFilters } from "@/components/PlaceFilters";
 import { RelatedCitiesBlock } from "@/components/RelatedCitiesBlock";
@@ -32,7 +33,14 @@ export const dynamicParams = false;
 export const revalidate = 2592000;
 
 export async function generateStaticParams() {
-  return (await getAllCities()).map((c) => ({ slug: c.slug }));
+  // safeStaticParams: if Supabase is still unreachable after withDbRetry's
+  // backoff, return [] so the build doesn't abort. dynamicParams stays false
+  // (the Jun 14 N+1/500 fix), so the next deploy or scheduled rebuild re-runs
+  // this against a healthy DB and restores all city pages.
+  return safeStaticParams(
+    async () => (await getAllCities()).map((c) => ({ slug: c.slug })),
+    "cities/[slug]",
+  );
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {

@@ -17,11 +17,6 @@ function toDate(value: string | null | undefined): Date {
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [allCities, allPlaces, allCategories] = await Promise.all([
-    getAllCities(),
-    getAllPlaces(),
-    getAllCategories(),
-  ]);
   const staticPages: MetadataRoute.Sitemap = [
     { url: `${BASE}`, lastModified: DEPLOY_TIME, changeFrequency: "weekly", priority: 1 },
     { url: `${BASE}/cities`, lastModified: DEPLOY_TIME, changeFrequency: "weekly", priority: 0.9 },
@@ -35,6 +30,27 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE}/privacy`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.2 },
     { url: `${BASE}/imprint`, lastModified: DEPLOY_TIME, changeFrequency: "yearly", priority: 0.1 },
   ];
+
+  // BUILD RESILIENCE: withDbRetry rides out a cold/paused Supabase. If the DB
+  // is still unreachable after retries, emit a static-only sitemap rather than
+  // aborting the build; revalidate (1h) refills the dynamic URLs once the DB is
+  // back. A briefly static-only sitemap is far better than a failed deploy.
+  let allCities: Awaited<ReturnType<typeof getAllCities>> = [];
+  let allPlaces: Awaited<ReturnType<typeof getAllPlaces>> = [];
+  let allCategories: Awaited<ReturnType<typeof getAllCategories>> = [];
+  try {
+    [allCities, allPlaces, allCategories] = await Promise.all([
+      getAllCities(),
+      getAllPlaces(),
+      getAllCategories(),
+    ]);
+  } catch (err) {
+    console.error(
+      "[sitemap] Supabase unreachable after retries; emitting static-only sitemap. Error:",
+      err,
+    );
+    return staticPages;
+  }
 
   // Fetch places per city ONCE — used for both the city lastmod bump below
   // and the programmatic landing-page emission further down. Hoisting avoids

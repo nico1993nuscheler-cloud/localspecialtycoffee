@@ -1,7 +1,13 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getAllCategories, getAllCities, getCategoryBySlug, getPlacesInCategory } from "@/lib/data";
+import {
+  getAllCategories,
+  getAllCities,
+  getCategoryBySlug,
+  getPlacesInCategory,
+  safeStaticParams,
+} from "@/lib/data";
 import { PlaceFilters } from "@/components/PlaceFilters";
 import { BrewtifulGuide } from "@/components/BrewtifulGuide";
 
@@ -9,7 +15,11 @@ export const dynamicParams = true;
 export const revalidate = 2592000;
 
 export async function generateStaticParams() {
-  return (await getAllCategories()).map((c) => ({ slug: c.slug }));
+  // dynamicParams = true — empty fallback on a DB outage is covered by ISR.
+  return safeStaticParams(
+    async () => (await getAllCategories()).map((c) => ({ slug: c.slug })),
+    "categories/[slug]",
+  );
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
