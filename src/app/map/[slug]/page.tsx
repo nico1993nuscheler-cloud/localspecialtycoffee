@@ -45,9 +45,12 @@ function seoBodyFor(cityName: string, places: PlaceWithRefs[]): string {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const city = await getCityBySlug(slug);
+  // BUILD RESILIENCE: withDbRetry already retries a transient DB error; if
+  // it's STILL failing after all retries, don't let one flaky city abort the
+  // whole build — degrade to no metadata for this page instead.
+  const city = await getCityBySlug(slug).catch(() => undefined);
   if (!city) return {};
-  const count = (await getPlacesInCity(city.webflow_id)).length;
+  const count = (await getPlacesInCity(city.webflow_id).catch(() => [])).length;
   const title = `${city.name} Coffee Map — ${count} Specialty Spots, Mapped`;
   const description = `Interactive map of ${count} specialty coffee shops & roasters in ${city.name}: pins with directions, a walking-crawl route, and a Google Map you can save for your trip.`;
   return {
@@ -64,9 +67,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CityMapPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const city = await getCityBySlug(slug);
+  // BUILD RESILIENCE: this route is individually pre-rendered for all ~60
+  // city slugs. dynamicParams = true (above) covers a slug missing from
+  // generateStaticParams entirely; this covers a slug that WAS included but
+  // whose own render failed after withDbRetry's retries — treat it as "not
+  // found" instead of aborting the whole build. Self-heals on next deploy
+  // or on-demand revalidate.
+  const city = await getCityBySlug(slug).catch(() => undefined);
   if (!city) return notFound();
-  const places = await getPlacesInCity(city.webflow_id);
+  const places = await getPlacesInCity(city.webflow_id).catch(() => []);
   const points = placesToMapPoints(places);
 
   // Distinct map/navigation intent (vs the editorial guide), with its own

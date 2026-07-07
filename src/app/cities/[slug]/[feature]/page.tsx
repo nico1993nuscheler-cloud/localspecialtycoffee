@@ -57,11 +57,14 @@ export async function generateMetadata({
   params: Promise<{ slug: string; feature: string }>;
 }): Promise<Metadata> {
   const { slug, feature } = await params;
-  const city = await getCityBySlug(slug);
+  // BUILD RESILIENCE: withDbRetry already retries a transient DB error; if
+  // it's STILL failing after all retries, don't let one flaky combo abort
+  // the whole build — degrade to no metadata for this page instead.
+  const city = await getCityBySlug(slug).catch(() => undefined);
   const f = FEATURE_BY_SLUG[feature];
   if (!city || !f) return {};
 
-  const placesInCity = await getPlacesInCity(city.webflow_id);
+  const placesInCity = await getPlacesInCity(city.webflow_id).catch(() => []);
   const matchCount = placesInCity.filter(
     (p) => (p as unknown as Record<string, boolean>)[f.boolean],
   ).length;
@@ -89,11 +92,26 @@ export default async function CityFeaturePage({
   params: Promise<{ slug: string; feature: string }>;
 }) {
   const { slug, feature } = await params;
-  const city = await getCityBySlug(slug);
+  // BUILD RESILIENCE: this route is individually pre-rendered for every
+  // indexable city+feature combo (dynamicParams = false — no on-demand ISR
+  // fallback). A single query timing out here (even after withDbRetry's 5
+  // attempts) used to abort the ENTIRE build. Treat a persistent failure as
+  // "not found" instead — this combo self-heals on the next deploy (every
+  // CMS injection triggers one) rather than failing every other combo too.
+  const city = await getCityBySlug(slug).catch(() => undefined);
   const f = FEATURE_BY_SLUG[feature];
   if (!city || !f) return notFound();
 
-  const allInCity = await getPlacesInCity(city.webflow_id);
+  let allInCity;
+  try {
+    allInCity = await getPlacesInCity(city.webflow_id);
+  } catch (err) {
+    console.error(
+      `[cities/${slug}/${feature}] Supabase unreachable after retries; serving 404 for this build. Error:`,
+      err,
+    );
+    return notFound();
+  }
   const matches = allInCity.filter(
     (p) => (p as unknown as Record<string, boolean>)[f.boolean],
   );

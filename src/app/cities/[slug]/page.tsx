@@ -45,7 +45,11 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const city = await getCityBySlug(slug);
+  // BUILD RESILIENCE: this route is individually pre-rendered for all ~60
+  // city slugs. withDbRetry already retries a transient DB error; if it's
+  // STILL failing after all retries, don't let one flaky city abort the
+  // whole build — degrade to no metadata for this page instead.
+  const city = await getCityBySlug(slug).catch(() => undefined);
   if (!city) return {};
   // Title-tag CTR optimization (May 31, 2026 GSC audit):
   // Old format: "Top 9 - <editorial H1> (2026)" → 70-90 chars, gets
@@ -56,7 +60,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // → 50-60 chars, leads with the high-intent query, ends with a proof
   // point. The editorial H1 stays on the page (still in <h1>), it just
   // isn't the SERP title anymore.
-  const places = await getPlacesInCity(city.webflow_id);
+  const places = await getPlacesInCity(city.webflow_id).catch(() => []);
   const year = new Date().getFullYear();
   const title =
     places.length > 0
@@ -82,14 +86,27 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function CityPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const city = await getCityBySlug(slug);
+  // BUILD RESILIENCE: this route is individually pre-rendered for all ~60
+  // city slugs (dynamicParams = false — see the Jun 14 SEO fix above, so
+  // there's no on-demand ISR fallback for a missing slug). A single query
+  // timing out here (even after withDbRetry's 5 attempts) used to abort the
+  // ENTIRE build. Treat a persistent failure as "not found" instead — the
+  // page self-heals on the next deploy (every CMS injection triggers one)
+  // or on-demand revalidate, rather than failing every other city too.
+  const city = await getCityBySlug(slug).catch(() => undefined);
   if (!city) return notFound();
-  const [places, allCategories, allCities, allPlaces] = await Promise.all([
-    getPlacesInCity(city.webflow_id),
-    getAllCategories(),
-    getAllCities(),
-    getAllPlaces(),
-  ]);
+  let places, allCategories, allCities, allPlaces;
+  try {
+    [places, allCategories, allCities, allPlaces] = await Promise.all([
+      getPlacesInCity(city.webflow_id),
+      getAllCategories(),
+      getAllCities(),
+      getAllPlaces(),
+    ]);
+  } catch (err) {
+    console.error(`[cities/${slug}] Supabase unreachable after retries; serving 404 for this build. Error:`, err);
+    return notFound();
+  }
 
   const cityMapPoints = placesToMapPoints(places);
 
