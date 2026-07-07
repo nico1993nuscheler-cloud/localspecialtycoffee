@@ -3,7 +3,7 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { OpenCookieSettings } from "@/components/OpenCookieSettings";
-import { getAllCities, getAllPlaces } from "@/lib/data";
+import { getAllCities, getFooterCityCounts } from "@/lib/data";
 
 const TAGLINE_BY_CITY: Record<string, string> = {
   "best-coffee-shops-in-new-york": "Explore NY's specialty coffee scene",
@@ -19,14 +19,16 @@ export async function Footer() {
   // city) with a single getAllPlaces() + in-memory grouping. The old pattern
   // caused Vercel function timeouts on dynamically-rendered pages (including
   // 404/not-found) because the Footer is part of the root layout.
-  const [cities, places] = await Promise.all([getAllCities(), getAllPlaces()]);
-  const countByCity = new Map<string, number>();
-  for (const p of places) {
-    countByCity.set(p.city_webflow_id, (countByCity.get(p.city_webflow_id) ?? 0) + 1);
-  }
+  //
+  // EGRESS FIX (Jul 2026): getAllPlaces() pulled the full ~2.3 MB
+  // places-light payload (every column, all rows) on every single page
+  // render just to count places per city — the Footer runs on every page,
+  // so this alone was the dominant driver of Supabase egress. Replaced with
+  // getFooterCityCounts(), which fetches only the `city_id` column.
+  const [cities, countByCity] = await Promise.all([getAllCities(), getFooterCityCounts()]);
   const withCounts = cities.map((c) => ({
     ...c,
-    _count: countByCity.get(c.webflow_id) ?? 0,
+    _count: countByCity[c.webflow_id] ?? 0,
   }));
   const featuredFooterCities = withCounts
     .sort((a, b) => b._count - a._count)
